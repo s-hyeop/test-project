@@ -26,6 +26,7 @@ build/
 # Gradle
 .gradle
 .gradle/
+gradle.properties
 **/build/
 !gradle-wrapper.jar
 !gradle-wrapper.properties

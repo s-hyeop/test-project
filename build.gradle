@@ -1,7 +1,14 @@
+buildscript {
+	ext {
+		jooqVersion = '3.19.25'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'nu.studer.jooq' version '9.0'
 }
 
 group = 'com.example'
@@ -32,8 +39,80 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation "org.jooq:jooq:${jooqVersion}"
+	implementation ('org.springframework.boot:spring-boot-starter-jooq') {
+			exclude group: 'org.jooq:jooq'
+	}
+	jooqGenerator 'org.mariadb.jdbc:mariadb-java-client'
+	jooqGenerator "org.jooq:jooq:${jooqVersion}"
+	jooqGenerator "org.jooq:jooq-meta:${jooqVersion}"
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+String jooqDBUsername = project.findProperty("jooqDBUsername")
+String jooqDBPassword = project.findProperty("jooqDBPassword")
+
+jooq {
+	version = "${jooqVersion}"
+	configurations {
+		songseunghyeopDB {
+			generationTool {
+				jdbc {
+					driver = 'org.mariadb.jdbc.Driver'
+					url = 'jdbc:mariadb://localhost:3308'
+					user = "${jooqDBUsername}"
+					password = "${jooqDBPassword}"
+				}
+
+				generator {
+					name = 'org.jooq.codegen.DefaultGenerator'
+
+					database {
+						name = 'org.jooq.meta.mariadb.MariaDBDatabase'
+
+						schemata {
+							schema {
+								inputSchema = 'songseunghyeop'
+							}
+						}
+
+						forcedTypes {
+							forcedType {
+								name = 'BOOLEAN'
+								includeTypes = '(?i:(TINY|SMALL|MEDIUM|BIG)?INT(UNSIGNED)?\\(1\\))'
+							}
+						}
+					}
+
+					generate {
+						daos = true
+						records = true
+						pojos = true
+						immutablePojos = true
+						fluentSetters = true
+						javaTimeTypes = true
+						deprecated = false
+					}
+
+					target {
+						packageName = "${group}.jooq.generated"
+						directory   = 'src/generated'
+						clean       = true
+					}
+				}
+			}
+		}
+	}
+
+	sourceSets {
+		main {
+			java {
+				srcDirs = ["src/main/java", "src/generated"]
+			}
+		}
+	}
 }
