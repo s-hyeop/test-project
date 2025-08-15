@@ -48,6 +48,8 @@ dependencies {
 	jooqGenerator 'org.mariadb.jdbc:mariadb-java-client'
 	jooqGenerator "org.jooq:jooq:${jooqVersion}"
 	jooqGenerator "org.jooq:jooq-meta:${jooqVersion}"
+	
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 tasks.named('test') {
