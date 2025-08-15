@@ -2,6 +2,7 @@ buildscript {
 	ext {
 		jooqVersion = '3.19.25'
 	}
+
 }
 
 plugins {
@@ -53,6 +54,9 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+String jooqDBHost = project.findProperty("jooqDBHost")
+String jooqDBPort = project.findProperty("jooqDBPort")
+String jooqDBSchema = project.findProperty("jooqDBSchema")
 String jooqDBUsername = project.findProperty("jooqDBUsername")
 String jooqDBPassword = project.findProperty("jooqDBPassword")
 
@@ -63,7 +67,7 @@ jooq {
 			generationTool {
 				jdbc {
 					driver = 'org.mariadb.jdbc.Driver'
-					url = 'jdbc:mariadb://localhost:3308'
+					url = "jdbc:mariadb://${jooqDBHost}:${jooqDBPort}"
 					user = "${jooqDBUsername}"
 					password = "${jooqDBPassword}"
 				}
@@ -76,7 +80,7 @@ jooq {
 
 						schemata {
 							schema {
-								inputSchema = 'songseunghyeop'
+								inputSchema = "${jooqDBSchema}"
 							}
 						}
 

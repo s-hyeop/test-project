@@ -10,7 +10,7 @@ HELP.md
 *.war
 *.ear
 *.log
-
+application-database.properties
 
 # Build directories
 build/
@@ -95,3 +95,4 @@ logs/
 # ------------------------
 .env
 .env.*
+/.metadata/
