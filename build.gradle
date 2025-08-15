@@ -43,7 +43,7 @@ dependencies {
 
 	implementation "org.jooq:jooq:${jooqVersion}"
 	implementation ('org.springframework.boot:spring-boot-starter-jooq') {
-			exclude group: 'org.jooq:jooq'
+		exclude group: 'org.jooq:jooq'
 	}
 	jooqGenerator 'org.mariadb.jdbc:mariadb-java-client'
 	jooqGenerator "org.jooq:jooq:${jooqVersion}"
