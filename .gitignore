@@ -1,0 +1,96 @@
+HELP.md
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ------------------------
+# Java / Spring Boot
+# ------------------------
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+
+# Build directories
+build/
+/build/
+/target/
+/out/
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+.mvn/wrapper/maven-wrapper-downloader.jar
+
+# Gradle
+.gradle
+.gradle/
+**/build/
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
+
+# ------------------------
+# IDE - VS Code
+# ------------------------
+.vscode/
+.history/
+*.code-workspace
+
+# ------------------------
+# IDE - IntelliJ IDEA
+# ------------------------
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ------------------------
+# IDE - Eclipse & STS
+# ------------------------
+bin/
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# ------------------------
+# NetBeans
+# ------------------------
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ------------------------
+# OS-specific files
+# ------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------
+# Logs & Temp
+# ------------------------
+*.log
+logs/
+*.tmp
+*.swp
+*.swo
+
+# ------------------------
+# Environment files
+# ------------------------
+.env
+.env.*
