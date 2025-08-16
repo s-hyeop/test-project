@@ -1,0 +1,67 @@
+주제: TODO List
+
+|페이지 정리
+ 01. 인트로 페이지
+ 02. TODO 목록 페이지
+ 03. TODO 보기 페이지
+ 04. TODO 작성 페이지
+ 05. TODO 수정 페이지
+ 06. 로그인 이메일 입력 페이지
+ 07. 로그인 페이지
+ 08. 회원가입 페이지 -(이메일 인증 대기)> Waiting Modal -(이메일 인증 성공)> Success Modal -> 로그인 페이지로 이동
+ 09. 비밀번호 초기화, 이메일 입력 페이지 -(이메일 인증 대기)> Waiting Modal -(이메일 인증 성공)> Success Modal -> 비밀번호 초기화 페이지로 이동
+ 10. 비밀번호 초기화, 비밀번호 초기화 페이지 -> Success Modal -> 로그인 페이지로 이동
+ 11. 마이 페이지 - 회원 정보 및 투두 통계, 비밀번호 변경
+ 12. 이메일 인증 완료[ 회원가입, 이메일 ]
+ 13. 이메일 인증 실패[ 회원가입, 이메일 ]
+
+|페이지별 요구 사항 정리
+ 1. TODO 메모지 색상 지원
+ 2. TODO 통계 [ TODO 전체 달성률, 오늘 완료한 TODO, 미완료 TODO ]
+ 3. 현재 접속된 계정 불러오기
+
+|JWT 구조
+ * 로그인
+  - AT(JWT), RT 발급
+ * 재발급
+  - 1. IF (AT.expiresAt - 임계시간 >= now()) 비정상 재발급
+  - 2. IF (RT.expiresAt >= now()) 만료
+  - 3. AT 발급, RT 재발급, RT DB 갱신(RT, RT.TTL, RT.expiresAt)
+ * 그 외 요청
+  - IF AT 만료: 40X
+  - IF AT 만료 임박: header "X-Token-Refresh-Now: 1"
+
+|데이터베이스
+ * USERS [ email(pk), password, userName, role, createdAt, lastLoginAt ]
+ * TODOS [ todoId(uuid v7, pk), email, subject, content, createdAt, dueAt, updatedAt, completeAt ]
+ * REFRESH_TOKENS [ tokenNo(AI, PK), email, RT, issuedOS, createdAt, RTExpiresAt, ATExpiresAt  ]
+
+|REST API
+ * 
+
+|참고
+ * 시간
+  - Java OffsetDateTime
+  - DB DATETIME
+
+ * [보안] 이메일 인증 회수 제한
+  - redis signup:email-code:난수 = ******
+  - redis signup:email-fail-count:난수 = ******
+  - 인증 시도 -> count 읽기 -> if count<=5 -> 실패 -> --count
+
+ * [보안] 환경변수 관리 (Git에 업로드 되지 않도록)
+
+ * [보안] 로그인 Rate Limiting
+  - 실패 {
+    TTL 설정
+    없으면 redis 추가
+    있으면 ++counter
+  }
+
+ * 로그 레벨
+  1. TRACE
+  2. DEBUG
+  3. INFO
+  4. WARN
+  5. ERROR
+  6. FATAL
