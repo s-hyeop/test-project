@@ -12,15 +12,15 @@ class TestProjectApplicationTests {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-	// @Test
-	// void contextLoads() {
-	// }
+	@Test
+	void contextLoads() {
+	}
 
-	// @Test
-	// public void testRedis() {
-    //     redisTemplate.opsForValue().set("hello", "world");
-    //     String value = redisTemplate.opsForValue().get("hello");
-    //     System.out.println("Redis 값 확인: " + value);
-	// }
+	@Test
+	public void testRedis() {
+        redisTemplate.opsForValue().set("hello", "world");
+        String value = redisTemplate.opsForValue().get("hello");
+        System.out.println("Redis 값 확인: " + value);
+	}
 
 }
