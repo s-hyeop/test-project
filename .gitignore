@@ -10,7 +10,7 @@ HELP.md
 *.war
 *.ear
 *.log
-application-database.properties
+src/main/resources/application.properties
 
 # Build directories
 build/
@@ -26,8 +26,8 @@ build/
 # Gradle
 .gradle
 .gradle/
-gradle.properties
 **/build/
+gradle.properties
 !gradle-wrapper.jar
 !gradle-wrapper.properties
 !gradle/wrapper/gradle-wrapper.jar

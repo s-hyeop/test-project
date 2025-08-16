@@ -1,0 +1,11 @@
+spring.application.name=test-project
+spring.datasource.url=jdbc:mariadb://{DB_HOST}:{DB_PORT}/{DB_SCHEMA}
+spring.datasource.username={DB_USER}
+spring.datasource.password={DB_PASS}
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+spring.data.redis.host={REDIS_HOST}
+spring.data.redis.port={REDIS_PORT}
+spring.data.redis.password={REDIS_PASS}
+spring.data.redis.timeout=2000
+spring.jooq.sql-dialect=mariadb
+logging.level.org.jooq.tools.LoggerListener=INFO

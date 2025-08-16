@@ -35,6 +35,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jooq'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -56,11 +57,11 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-String jooqDBHost = project.findProperty("jooqDBHost")
-String jooqDBPort = project.findProperty("jooqDBPort")
-String jooqDBSchema = project.findProperty("jooqDBSchema")
-String jooqDBUsername = project.findProperty("jooqDBUsername")
-String jooqDBPassword = project.findProperty("jooqDBPassword")
+String dbHost = findProperty("DB_HOST")
+String dbPort = findProperty("DB_PORT")
+String dbSchema = findProperty("DB_SCHEMA")
+String dbUser = findProperty("DB_USER")
+String dbPass = findProperty("DB_PASS")
 
 jooq {
 	version = "${jooqVersion}"
@@ -69,9 +70,9 @@ jooq {
 			generationTool {
 				jdbc {
 					driver = 'org.mariadb.jdbc.Driver'
-					url = "jdbc:mariadb://${jooqDBHost}:${jooqDBPort}"
-					user = "${jooqDBUsername}"
-					password = "${jooqDBPassword}"
+					url = "jdbc:mariadb://${dbHost}:${dbPort}"
+					user = "${dbUser}"
+					password = "${dbPass}"
 				}
 
 				generator {
@@ -82,7 +83,7 @@ jooq {
 
 						schemata {
 							schema {
-								inputSchema = "${jooqDBSchema}"
+								inputSchema = "${dbSchema}"
 							}
 						}
 

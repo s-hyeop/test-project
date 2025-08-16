@@ -1,3 +1,0 @@
-DB_URL=jdbc:mariadb://host:post/schema
-DB_USERNAME=
-DB_PASSWORD=
