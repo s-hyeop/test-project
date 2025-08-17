@@ -69,8 +69,8 @@
 
   01. todo 목록 불러오기: {
     uri: [GET] /todos
-      ?status=[all|completed|incomplete]
-      &searchBy[title|content]
+      ?status=[all|complete|incomplete]
+      &searchType[title|content]
       &keyword
       &page
       &size
@@ -113,7 +113,6 @@
       title
       content
       color
-      sequence
       dueAt
     } # TodoCreateRequest.java
     response: { todoId } # TodoCreateResponse.java
