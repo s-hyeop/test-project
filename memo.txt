@@ -58,35 +58,235 @@
     token_no, [PK, AI, NN]
     user_no, int, [NN, FK(users.user_no ON DELETE `삭제`)] # 이메일
     refresh_token, char(36), [NN, UK] # refresh_token
-    issued_os, varchar(100), [NN] # 최초 발급 OS
+    client_os, varchar(100), [NN] # 최초 발급 OS
     access_token_expires_at, DATETIME, [NN] # AT 만료일자
     refresh_token_expires_at, DATETIME, [NN] # RT 만료일자
     created_at, DATETIME, [NN] # 토큰 생성일자
   ]
 
 |REST API
- 01. todo 목록 불러오기
- 02. todo 단일 불러오기
- 03. todo 작성
- 04. todo 수정
- 05. todo 미완료 -> 완료
- 06. todo 완료 -> 미완료
- 07. todo 순서 변경
- 08. todo 삭제
- 09. 이메일 있는지 확인
- 10. 로그인 처리
- 11. 회원가입 요청 (이메일 인증번호 전송)
- 12. 회원가입 인증번호 확인(실제 처리)
- 13. 비밀번호 초기화 요청 (이메일 인증번호 전송)
- 14. 회원 정보 불러오기
- 15. todo 정보 불러오기
- 16. 로그인된 정보 불러오기
- 17. 회원 정보 변경
- 18. 비밀번호 변경
- 19. 토큰 재발급
- 20. 타겟 로그아웃
- 21. 현재 로그아웃
- 22. 로그인 상태 확인
+  00. response header
+
+  01. todo 목록 불러오기: {
+    uri: [GET] /todos
+      ?status=[all|completed|incomplete]
+      &searchBy[title|content]
+      &keyword
+      &page
+      &size
+    request: null
+    response: [{
+      todoId
+      title
+      content
+      color
+      sequence
+      dueAt
+      completedAt
+      createdAt
+      updatedAt
+    }]
+    response header: {
+      X-Total-Count
+    }
+  }
+
+  02. todo 단일 불러오기: {
+    uri: [GET] /todos/{todoId}
+    request: null
+    response: {
+      todoId
+      title
+      content
+      color
+      sequence
+      dueAt
+      completedAt
+      createdAt
+      updatedAt
+    }
+  }
+
+  03. todo 작성: {
+    uri: [POST] /todos
+    request: null
+    response: { todoId }
+  }
+
+  04. todo 일괄 수정: {
+    uri: [PUT] /todos/{todoId}
+    request: {
+      title
+      content
+      color
+      dueAt
+    }
+    response: null
+  }
+
+  05. todo 부분 수정: {
+    uri: [PATCH] /todos/{todoId}
+    request: {
+      ?completed: bool
+      ?sequence: int
+    }
+    response: null
+  }
+
+  06. todo 삭제: {
+    uri: [DELETE] /todos/{todoId}
+    request: null
+    response: null
+  }
+
+  07. 이메일 있는지 확인: {
+    uri: [POST] /auth/email/validate
+    request: { email }
+    response: { available: bool }
+  }
+
+  08. 로그인 처리: {
+    uri: [POST] /auth/login 
+    request: {
+      email
+      password
+    }
+    response: {
+      JWT 관련 반환
+    }
+  }
+
+  09. 회원가입 요청 (이메일 인증번호 전송): {
+    uri: [POST] /auth/signup/code
+    request: { email }
+    response: null
+  }
+
+  10. 회원가입 인증번호 확인(코드 확인만): {
+    uri: [POST] /auth/signup/verify
+    request: {
+      email
+      code
+    }
+    response: null
+  }
+
+  11. 회원가입 처리 (실제 처리 및 이메일 인증번호 말소){
+    uri: [POST] /auth/signup
+    request: {
+      email
+      password
+      userName
+      code
+    }
+    response: null
+  }
+
+  12. 비밀번호 재설정 요청 (이메일 인증번호 전송): {
+    uri: [POST] /auth/reset-password/code
+    request: { email }
+    response: null
+  }
+
+  13. 비밀번호 재설정 인증번호 확인(코드 확인만): {
+    uri: [POST] /auth/reset-password/verify
+    request: {
+      email
+      code
+    }
+    response: null
+  }
+
+  14. 비밀번호 재설정 처리 (실제 처리 및 이메일 인증번호 말소){
+    uri: [POST] /auth/reset-password
+    request: {
+      email
+      password
+      code
+    }
+    response: null
+  }
+
+  15. 회원 정보 불러오기: {
+    uri: [GET] /users/{userNo}
+    request: null
+    response: {
+      email
+      userName
+      createdAt
+    }
+  }
+
+  16. todo 통계 정보 불러오기: {
+    uri: [GET] /todos/statistics
+    request: null
+    response: {
+      totalCount // 전체 개수
+      completedCount // 완료 개수
+      todayCompletedCount // 오늘 완료한 개수
+    }
+  }
+
+  17. 로그인 정보 불러오기: {
+    uri: [GET] /auth/tokens
+    request: null
+    response: [{
+      clientOs
+      createdAt
+    }]
+  }
+
+  18. 회원 정보 변경: {
+    uri: [PATCH] /users/{userNo}
+    request: { userName }
+    response: null
+  }
+
+  19. 비밀번호 변경: {
+    uri: [PATCH] /users/{userNo}/change-password
+    request: {
+      password
+      newPassword
+    }
+    response: null
+  }
+
+  20. 토큰 재발급: {
+    uri: [POST] /auth/tokens/refresh
+    request: null
+    response: {
+      JWT 관련 반환
+    }
+  }
+
+  21. 타겟 로그아웃: {
+    uri: [DELETE] /auth/sessions/{tokenNo}|current
+    request: null
+    response: null
+  }
+
+  [GET]    /todos # TODO 목록 조회
+  [GET]    /todos/{todoId} # TODO 선택 조회
+  [POST]   /todos # TODO 추가
+  [PUT]    /todos/{todoId} # TODO 일괄 수정
+  [PATCH]  /todos/{todoId} # TODO 부분 수정
+  [DELETE] /todos/{todoId} # TODO 삭제
+  [GET]    /todos/statistics # 나의 TODO 통계 불러오기
+  [POST]   /auth/email/validate # 이메일 유효한지 확인
+  [POST]   /auth/login # 로그인 처리
+  [POST]   /auth/signup/code # 회원가입 이메일 코드 발송
+  [POST]   /auth/signup/verify # 회원가입 이메일 코드 확인
+  [POST]   /auth/signup # 회원가입 처리
+  [POST]   /auth/reset-password/code # 비밀번호 재설정 이메일 코드 발송
+  [POST]   /auth/reset-password/verify # 비밀번호 재설정 이메일 코드 확인
+  [POST]   /auth/reset-password # 비밀번호 재설정 처리
+  [GET]    /users/{userNo} # 회원 정보 조회
+  [PATCH]  /users/{userNo} # 회원 정보 부분 수정
+  [PATCH]  /users/{userNo}/password # 회원 비밀번호 재설정 (현재 비밀번호 확인이 필요함으로 별도 로직으로 분리)
+  [GET]    /auth/tokens # 내 토큰(세션)목록 불러오기
+  [POST]   /auth/tokens/refresh # 내 토큰(세션) 재발급
+  [DELETE] /auth/tokens/{tokenNo}|current # 내 토큰(세션) 삭제(로그아웃)
+
 
 |참고
  * 시간
