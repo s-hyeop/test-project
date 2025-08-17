@@ -1,4 +1,4 @@
-package com.example.test_project.Config;
+package com.example.test_project.config;
 
 import org.springframework.boot.autoconfigure.jooq.DefaultConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
