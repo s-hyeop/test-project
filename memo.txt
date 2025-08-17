@@ -74,7 +74,7 @@
       &keyword
       &page
       &size
-    request: null
+    request: null # TodoListRequest.java
     response: [{
       todoId
       title
@@ -85,7 +85,7 @@
       completedAt
       createdAt
       updatedAt
-    }]
+    }] # TodoDetailResponse
     response header: {
       X-Total-Count
     }
@@ -104,13 +104,19 @@
       completedAt
       createdAt
       updatedAt
-    }
+    } # TodoDetailResponse
   }
 
   03. todo 작성: {
     uri: [POST] /todos
-    request: null
-    response: { todoId }
+    request: {
+      title
+      content
+      color
+      sequence
+      dueAt
+    } # TodoCreateRequest.java
+    response: { todoId } # TodoCreateResponse.java
   }
 
   04. todo 일괄 수정: {
@@ -120,7 +126,7 @@
       content
       color
       dueAt
-    }
+    } # TodoUpdateRequest.java
     response: null
   }
 
@@ -129,7 +135,7 @@
     request: {
       ?completed: bool
       ?sequence: int
-    }
+    } # TodoPatchRequest.java
     response: null
   }
 
@@ -141,8 +147,8 @@
 
   07. 이메일 있는지 확인: {
     uri: [POST] /auth/email/validate
-    request: { email }
-    response: { available: bool }
+    request: { email } # EmailValidateRequest.java
+    response: null
   }
 
   08. 로그인 처리: {
@@ -150,15 +156,15 @@
     request: {
       email
       password
-    }
+    } # LoginRequest.java
     response: {
       JWT 관련 반환
-    }
+    } # AccessTokenResponse.java
   }
 
   09. 회원가입 요청 (이메일 인증번호 전송): {
     uri: [POST] /auth/signup/code
-    request: { email }
+    request: { email } # SignupCodeSendRequest.java
     response: null
   }
 
@@ -167,7 +173,7 @@
     request: {
       email
       code
-    }
+    } # SignupCodeVerifyRequest.java
     response: null
   }
 
@@ -178,13 +184,13 @@
       password
       userName
       code
-    }
+    } # SignupRequest.java
     response: null
   }
 
   12. 비밀번호 재설정 요청 (이메일 인증번호 전송): {
     uri: [POST] /auth/reset-password/code
-    request: { email }
+    request: { email } # ResetPasswordCodeSendRequest.java
     response: null
   }
 
@@ -193,7 +199,7 @@
     request: {
       email
       code
-    }
+    } # ResetPasswordCodeVerifyRequest.java
     response: null
   }
 
@@ -203,7 +209,7 @@
       email
       password
       code
-    }
+    } # ResetPasswordRequest.java
     response: null
   }
 
@@ -214,7 +220,7 @@
       email
       userName
       createdAt
-    }
+    } # UserDetailResponse.java
   }
 
   16. todo 통계 정보 불러오기: {
@@ -224,7 +230,7 @@
       totalCount // 전체 개수
       completedCount // 완료 개수
       todayCompletedCount // 오늘 완료한 개수
-    }
+    } # TodoStatisticsResponse.java
   }
 
   17. 로그인 정보 불러오기: {
@@ -233,12 +239,12 @@
     response: [{
       clientOs
       createdAt
-    }]
+    }] # RefreshTokenResponse.java
   }
 
   18. 회원 정보 변경: {
     uri: [PATCH] /users/{userNo}
-    request: { userName }
+    request: { userName } # UserPatchRequest.java
     response: null
   }
 
@@ -247,7 +253,7 @@
     request: {
       password
       newPassword
-    }
+    } # UserChangePasswordRequest.java
     response: null
   }
 
@@ -256,11 +262,11 @@
     request: null
     response: {
       JWT 관련 반환
-    }
+    } # AccessTokenResponse.java
   }
 
   21. 타겟 로그아웃: {
-    uri: [DELETE] /auth/sessions/{tokenNo}|current
+    uri: [DELETE] /auth/tokens/{tokenNo}|current
     request: null
     response: null
   }
@@ -280,12 +286,12 @@
   [POST]   /auth/reset-password/code # 비밀번호 재설정 이메일 코드 발송
   [POST]   /auth/reset-password/verify # 비밀번호 재설정 이메일 코드 확인
   [POST]   /auth/reset-password # 비밀번호 재설정 처리
-  [GET]    /users/{userNo} # 회원 정보 조회
-  [PATCH]  /users/{userNo} # 회원 정보 부분 수정
-  [PATCH]  /users/{userNo}/password # 회원 비밀번호 재설정 (현재 비밀번호 확인이 필요함으로 별도 로직으로 분리)
   [GET]    /auth/tokens # 내 토큰(세션)목록 불러오기
   [POST]   /auth/tokens/refresh # 내 토큰(세션) 재발급
   [DELETE] /auth/tokens/{tokenNo}|current # 내 토큰(세션) 삭제(로그아웃)
+  [GET]    /users/{userNo} # 회원 정보 조회
+  [PATCH]  /users/{userNo} # 회원 정보 부분 수정
+  [PATCH]  /users/{userNo}/password # 회원 비밀번호 재설정 (현재 비밀번호 확인이 필요함으로 별도 로직으로 분리)
 
 
 |참고
