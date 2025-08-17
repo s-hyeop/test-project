@@ -11,7 +11,7 @@
  08. 회원가입 페이지 -(이메일 인증 대기)> Waiting Modal -(이메일 인증 성공)> Success Modal -> 로그인 페이지로 이동
  09. 비밀번호 초기화, 이메일 입력 페이지 -(이메일 인증 대기)> Waiting Modal -(이메일 인증 성공)> Success Modal -> 비밀번호 초기화 페이지로 이동
  10. 비밀번호 초기화, 비밀번호 초기화 페이지 -> Success Modal -> 로그인 페이지로 이동
- 11. 마이 페이지 - 회원 정보 및 투두 통계, 비밀번호 변경
+ 11. 마이 페이지 - 회원 정보 및 투두 통계, 비밀번호 변경, 현재 접속된 계정 불러오기
  12. 이메일 인증 완료[ 회원가입, 이메일 ]
  13. 이메일 인증 실패[ 회원가입, 이메일 ]
 
@@ -32,12 +32,61 @@
   - IF AT 만료 임박: header "X-Token-Refresh-Now: 1"
 
 |데이터베이스
- * USERS [ email(pk), password, userName, role, createdAt, lastLoginAt ]
- * TODOS [ todoId(uuid v7, pk), email, subject, content, createdAt, dueAt, updatedAt, completeAt ]
- * REFRESH_TOKENS [ tokenNo(AI, PK), email, RT, issuedOS, createdAt, RTExpiresAt, ATExpiresAt  ]
+  users [
+    user_no, int, [PK, AI, NN] # 회원 고유 번호
+    email, varchar(300), [UK, NN] # 이메일
+    password, varchar(100), [NN] # 비밀번호
+    user_name, varchar(30), [NN] # 회원이름
+    role, varchar(10), [NN] # 권한
+    created_at, DATETIME, [NN] # 생성일
+    deleted_at, DATETIME, [NN] # 탈퇴일
+    last_login_at, DATETIME, [NN] # 마지막 로그인 일
+  ]
+  todos [
+    todo_id, char(36), [PK, NN] # TODO 아이디
+    user_no, int, [NN, FK(users.user_no ON DELETE `삭제`)] # 이메일
+    title, VARCHAR(300), [NN] # 제목
+    content, TEXT, [NN] # 내용
+    color, VARCHAR(30), [NN] # 색상
+    sequence, INT, [NN] # 순서
+    due_at, DATE, [NN] # 마감일
+    completed_at, DATETIME # 완료일
+    created_at, DATETIME, [NN] # 생성일
+    updated_at, DATETIME # 수정일
+  ]
+  tokens [
+    token_no, [PK, AI, NN]
+    user_no, int, [NN, FK(users.user_no ON DELETE `삭제`)] # 이메일
+    refresh_token, char(36), [NN, UK] # refresh_token
+    issued_os, varchar(100), [NN] # 최초 발급 OS
+    access_token_expires_at, DATETIME, [NN] # AT 만료일자
+    refresh_token_expires_at, DATETIME, [NN] # RT 만료일자
+    created_at, DATETIME, [NN] # 토큰 생성일자
+  ]
 
 |REST API
- * 
+ 01. todo 목록 불러오기
+ 02. todo 단일 불러오기
+ 03. todo 작성
+ 04. todo 수정
+ 05. todo 미완료 -> 완료
+ 06. todo 완료 -> 미완료
+ 07. todo 순서 변경
+ 08. todo 삭제
+ 09. 이메일 있는지 확인
+ 10. 로그인 처리
+ 11. 회원가입 요청 (이메일 인증번호 전송)
+ 12. 회원가입 인증번호 확인(실제 처리)
+ 13. 비밀번호 초기화 요청 (이메일 인증번호 전송)
+ 14. 회원 정보 불러오기
+ 15. todo 정보 불러오기
+ 16. 로그인된 정보 불러오기
+ 17. 회원 정보 변경
+ 18. 비밀번호 변경
+ 19. 토큰 재발급
+ 20. 타겟 로그아웃
+ 21. 현재 로그아웃
+ 22. 로그인 상태 확인
 
 |참고
  * 시간
