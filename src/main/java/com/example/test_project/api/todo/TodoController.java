@@ -25,11 +25,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/todos")
 @Tag(name = "DOTO API", description = "TODO CRUD 및 통계 API")
+@RequiredArgsConstructor
 public class TodoController {
+
+    private final TodoService todoService;
 
     @Operation(summary = "TODO 목록 조회", description = "사용자가 등록한 TODO 목록을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 TODO 목록 조회됨")

@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "인증 API", description = "회원가입, 로그인, 토큰 관리 등의 인증 관련 API")
+@RequiredArgsConstructor
 public class AuthController {
+
+    private final AuthService authService;
 
     @Operation(summary = "이메일 유효성 검사", description = "회원가입 시 이메일이 이미 사용 중인지 확인합니다.")
     @ApiResponse(responseCode = "200", description = "사용 가능한 이메일")
