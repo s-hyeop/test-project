@@ -26,7 +26,7 @@
  * 재발급
   - 1. IF (AT.expiresAt - 임계시간 >= now()) 비정상 재발급
   - 2. IF (RT.expiresAt >= now()) 만료
-  - 3. AT 발급, RT 재발급, RT DB 갱신(RT, RT.TTL, RT.expiresAt)
+  - 3. AT 발급, RT DB 갱신
  * 그 외 요청
   - IF AT 만료: 40X
   - IF AT 만료 임박: header "X-Token-Refresh-Now: 1"
@@ -296,28 +296,70 @@
 
 
 |참고
- * 시간
-  - Java OffsetDateTime
-  - DB DATETIME
+  * 시간
+    - Java OffsetDateTime
+    - DB DATETIME
 
- * [보안] 이메일 인증 회수 제한
-  - redis signup:email-code:난수 = ******
-  - redis signup:email-fail-count:난수 = ******
-  - 인증 시도 -> count 읽기 -> if count<=5 -> 실패 -> --count
+  * [보안] 이메일 인증 회수 제한
+    - redis signup:email-code:난수 = ******
+    - redis signup:email-fail-count:난수 = ******
+    - 인증 시도 -> count 읽기 -> if count<=5 -> 실패 -> --count
 
- * [보안] 환경변수 관리 (Git에 업로드 되지 않도록)
+  * [보안] 환경변수 관리 (Git에 업로드 되지 않도록)
 
- * [보안] 로그인 Rate Limiting
-  - 실패 {
-    TTL 설정
-    없으면 redis 추가
-    있으면 ++counter
-  }
+  * [보안] 로그인 Rate Limiting
+    - 실패 {
+      TTL 설정
+      없으면 redis 추가
+      있으면 ++counter
+    }
 
- * 로그 레벨
-  1. TRACE
-  2. DEBUG
-  3. INFO
-  4. WARN
-  5. ERROR
-  6. FATAL
+  * 로그 레벨
+    1. TRACE
+    2. DEBUG
+    3. INFO
+    4. WARN
+    5. ERROR
+    6. FATAL
+
+  * JWT 로그인 예제
+    defailt:
+      1. security form.login(UsernamePasswordAuthenticationFilter) 를 비활성화 한다.
+        -> UsernamePasswordAuthenticationFilter를 비활성화 하지 않을 경우 UsernamePasswordAuthenticationFilter를 POST /login 을 Mapping 해서 AuthenticationManager를 실행한다.
+      2. security config 에서 AuthenticationManager의 DaoAuthenticationProvider 가 실행할 UserDetailsService 와 PasswordEncoder 를 만들어 내껄로 덮어써 준다.
+        -> 아닐 경우 security 기본 DaoAuthenticationProvider.UserDetailsService 가 실행 됨.
+      3. UserDetails 구현 해둬야 함 (UserDetailsService 의 출력 값 인터페이스임)
+
+    example:
+      @PostMapping("/auth/login")
+      public ResponseEntity<Void> login(@RequestBody LoginRequest request) {
+          LoginResponse response = AuthService.login(request);
+
+          // LoginResponse 의 cookie 는 출력안되게끔 설정
+
+          return ResponseEntity.ok()
+              .header(HttpHeaders.SET_COOKIE, response.cookie.toString())
+              .body(response);
+      }
+
+
+      public LoginResponse login(LoginRequest request) {
+          // Rate Limiting 로직 수행
+
+          Authentication authentication = authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                      request.getEmail(),
+                      request.getPassword()
+              )
+          );
+
+          // 인증 성공 시 authentication.getPrincipal() 에 UserDetails 들어있음
+          CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal(); // 없으면 실패 예외 던지기
+
+          // JWT 발급
+          String token = jwtTokenProvider.createToken(userDetails.getId(), userDetails.getAuthorities());
+
+          // 등등 db 로직
+
+          return loginResponse;
+      }
