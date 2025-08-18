@@ -1,6 +1,5 @@
 package com.example.test_project.api.auth;
 
-import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 
 import com.example.test_project.api.auth.dto.request.EmailValidateRequest;
@@ -18,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final DSLContext dsl;
+    private final AuthRepository authRepository;
 
     public void validateEmail(EmailValidateRequest emailValidateRequest) {
 

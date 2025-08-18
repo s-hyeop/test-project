@@ -1,6 +1,5 @@
 package com.example.test_project.api.todo;
 
-import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 
 import com.example.test_project.api.todo.dto.request.TodoCreateRequest;
@@ -14,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TodoService {
 
-    private final DSLContext dsl;
+    private final TodoRepository todoRepository;
 
     public void getTodos(int userNo, TodoListRequest todoListRequest) {
 

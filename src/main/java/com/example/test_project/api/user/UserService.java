@@ -1,7 +1,7 @@
 package com.example.test_project.api.user;
 
-import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final DSLContext dsl;
+    private final UserRepository userRepository;
 
     public void getUserDetail(int userNo) {
 
