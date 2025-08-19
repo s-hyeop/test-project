@@ -10,6 +10,8 @@ import com.example.test_project.api.auth.dto.request.ResetPasswordRequest;
 import com.example.test_project.api.auth.dto.request.SignupCodeSendRequest;
 import com.example.test_project.api.auth.dto.request.SignupCodeVerifyRequest;
 import com.example.test_project.api.auth.dto.request.SignupRequest;
+import com.example.test_project.api.auth.dto.response.AccessTokenResponse;
+import com.example.test_project.api.auth.dto.response.RefreshTokenDetailResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,8 +25,8 @@ public class AuthService {
 
     }
 
-    public void login(LoginRequest loginRequest) {
-
+    public AccessTokenResponse login(LoginRequest loginRequest) {
+        return AccessTokenResponse.builder().build();
     }
 
     public void sendSignupCode(SignupCodeSendRequest signupCodeSendRequest) {
@@ -51,12 +53,12 @@ public class AuthService {
 
     }
 
-    public void getTokens(int userNo) {
-
+    public RefreshTokenDetailResponse getTokens(int userNo) {
+        return RefreshTokenDetailResponse.builder().build();
     }
 
-    public void refreshAccessToken(int userNo, String refreshToken) {
-
+    public AccessTokenResponse refreshAccessToken(int userNo, String refreshToken) {
+        return AccessTokenResponse.builder().build();
     }
 
     public void deleteToken(int userNo, String refreshToken) {
