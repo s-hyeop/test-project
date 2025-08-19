@@ -46,7 +46,7 @@ public class UserController {
     public ResponseEntity<Void> updateUser(@Valid @RequestBody UserPatchRequest userPatchRequest) {
         int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
 
-        userService.updateUser(userNo);
+        userService.updateUser(userNo, userPatchRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -58,7 +58,7 @@ public class UserController {
     public ResponseEntity<Void> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest) {
         int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
 
-        userService.changePassword(userNo);
+        userService.changePassword(userNo, userChangePasswordRequest);
         return ResponseEntity.ok().build();
     }
 
