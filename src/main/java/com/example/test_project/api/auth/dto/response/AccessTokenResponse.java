@@ -1,6 +1,8 @@
 package com.example.test_project.api.auth.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessTokenResponse {
-    // JWT
-    private String JWT;
+    @JsonProperty("token")
+    private String accessToken;
+
+    @JsonIgnore
+    private String refreshToken; 
 }
