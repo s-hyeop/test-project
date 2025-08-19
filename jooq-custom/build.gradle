@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.example'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jooq:jooq-codegen:${jooqVersion}"
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+}
