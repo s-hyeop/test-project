@@ -9,3 +9,6 @@ spring.data.redis.password={REDIS_PASS}
 spring.data.redis.timeout=2000
 spring.jooq.sql-dialect=mariadb
 logging.level.org.jooq.tools.LoggerListener=INFO
+
+jwt.refresh-token-cookie-name={refresh-token}
+jwt.secret-key={secret-key}

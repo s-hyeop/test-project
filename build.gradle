@@ -16,6 +16,8 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 description = 'test project for Spring Boot'
 
+apply from: 'jooq.gradle'
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
@@ -32,99 +34,37 @@ repositories {
 	mavenCentral()
 }
 
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src/main/java", "src/generated"]
+		}
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-jooq'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-	annotationProcessor 'org.projectlombok:lombok'
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	implementation "org.jooq:jooq:${jooqVersion}"
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 	implementation ('org.springframework.boot:spring-boot-starter-jooq') {
 		exclude group: 'org.jooq:jooq'
 	}
 
-	jooqGenerator 'org.mariadb.jdbc:mariadb-java-client'
-	jooqGenerator "org.jooq:jooq:${jooqVersion}"
-	jooqGenerator "org.jooq:jooq-meta:${jooqVersion}"
-	
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+	implementation "org.jooq:jooq:${jooqVersion}"
+    implementation "org.jooq:jooq-meta:${jooqVersion}"
+    implementation "org.jooq:jooq-codegen:${jooqVersion}"
+    jooqGenerator project(':jooq-custom')
+
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-String dbHost = findProperty("DB_HOST")
-String dbPort = findProperty("DB_PORT")
-String dbSchema = findProperty("DB_SCHEMA")
-String dbUser = findProperty("DB_USER")
-String dbPass = findProperty("DB_PASS")
-
-jooq {
-	version = "${jooqVersion}"
-	configurations {
-		songseunghyeopDB {
-			generationTool {
-				jdbc {
-					driver = 'org.mariadb.jdbc.Driver'
-					url = "jdbc:mariadb://${dbHost}:${dbPort}"
-					user = "${dbUser}"
-					password = "${dbPass}"
-				}
-
-				generator {
-					name = 'org.jooq.codegen.DefaultGenerator'
-
-					database {
-						name = 'org.jooq.meta.mariadb.MariaDBDatabase'
-
-						schemata {
-							schema {
-								inputSchema = "${dbSchema}"
-							}
-						}
-
-						forcedTypes {
-							forcedType {
-								name = 'BOOLEAN'
-								includeTypes = '(?i:(TINY|SMALL|MEDIUM|BIG)?INT(UNSIGNED)?\\(1\\))'
-							}
-						}
-					}
-
-					generate {
-						daos = true
-						records = true
-						pojos = true
-						immutablePojos = true
-						fluentSetters = true
-						javaTimeTypes = true
-						deprecated = false
-					}
-
-					target {
-						packageName = "${group}.jooq.generated"
-						directory   = 'src/generated'
-						clean       = true
-					}
-				}
-			}
-		}
-	}
-
-	sourceSets {
-		main {
-			java {
-				srcDirs = ["src/main/java", "src/generated"]
-			}
-		}
-	}
 }
