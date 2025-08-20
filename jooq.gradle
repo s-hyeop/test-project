@@ -37,7 +37,7 @@ jooq {
 					}
 
 					generate {
-						records = false
+						records = true
 						pojos = true
 						fluentSetters = true
 						javaTimeTypes = true

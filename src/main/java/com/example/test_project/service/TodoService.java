@@ -10,7 +10,7 @@ import com.example.test_project.dto.response.TodoCreateResponse;
 import com.example.test_project.dto.response.TodoDetailResponse;
 import com.example.test_project.dto.response.TodoListResponse;
 import com.example.test_project.dto.response.TodoStatisticsResponse;
-import com.example.test_project.repository.TodoRepository;
+import com.example.test_project.repository.TodosRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TodoService {
 
-    private final TodoRepository todoRepository;
+    private final TodosRepository todosRepository;
 
     public TodoListResponse getTodos(int userNo, TodoListRequest todoListRequest) {
         return TodoListResponse.builder().build();

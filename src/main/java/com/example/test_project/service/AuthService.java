@@ -12,7 +12,7 @@ import com.example.test_project.dto.request.SignupCodeVerifyRequest;
 import com.example.test_project.dto.request.SignupRequest;
 import com.example.test_project.dto.response.AccessTokenResponse;
 import com.example.test_project.dto.response.RefreshTokenDetailResponse;
-import com.example.test_project.repository.AuthRepository;
+import com.example.test_project.repository.TokensRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthRepository authRepository;
+    private final TokensRepository tokensRepository;
 
     public void validateEmail(EmailValidateRequest emailValidateRequest) {
 

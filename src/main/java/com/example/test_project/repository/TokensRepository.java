@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class TodoRepository {
+public class TokensRepository {
 
     private final DSLContext dsl;
     
