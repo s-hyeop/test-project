@@ -1,5 +1,9 @@
 package com.example.test_project.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.jooq.DSLContext;
@@ -34,6 +38,75 @@ public class TodosRepository {
 
 
     /**
+     * 특정 회원의 Todo 목록을 페이징하여 조회합니다.
+     *
+     * @param userNo 조회할 회원 번호
+     * @param offset 시작 위치 (0 기반)
+     * @param limit  조회할 데이터 개수
+     * @return Todo 목록
+     */
+    public List<Todos> findPageByUserNo(int userNo, int offset, int limit) {
+        return dslContext.selectFrom(TODOS)
+                .where(TODOS.USER_NO.eq(userNo))
+                .orderBy(TODOS.TODO_ID.desc())
+                .limit(limit)
+                .offset(offset)
+                .fetchInto(Todos.class);
+    }
+
+
+    /**
+     * 특정 회원의 Todo 전체 개수를 조회합니다.
+     *
+     * @param userNo 조회할 회원 번호
+     * @return 총 Todo 개수
+     */
+    public int countByUserNo(int userNo) {
+        return dslContext.selectCount()
+                .from(TODOS)
+                .where(TODOS.USER_NO.eq(userNo))
+                .fetchOne(0, int.class);
+    }
+
+
+    /**
+     * 특정 회원의 완료된 Todo 개수를 조회합니다.
+     * completedAt이 null이 아닌 Todo를 완료된 것으로 간주합니다.
+     *
+     * @param userNo 조회할 회원 번호
+     * @return 완료된 Todo 개수
+     */
+    public int countCompletedByUserNo(int userNo) {
+        return dslContext.selectCount()
+                .from(TODOS)
+                .where(TODOS.USER_NO.eq(userNo))
+                .and(TODOS.COMPLETED_AT.isNotNull())
+                .fetchOne(0, int.class);
+    }
+
+
+    /**
+     * 특정 회원의 오늘 완료한 Todo 개수를 조회합니다.
+     * completedAt이 오늘 날짜인 Todo를 조회합니다.
+     *
+     * @param userNo 조회할 회원 번호
+     * @return 오늘 완료한 Todo 개수
+     */
+    public int countTodayCompletedByUserNo(int userNo) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+        
+        return dslContext.selectCount()
+                .from(TODOS)
+                .where(TODOS.USER_NO.eq(userNo))
+                .and(TODOS.COMPLETED_AT.isNotNull())
+                .and(TODOS.COMPLETED_AT.between(startOfDay, endOfDay))
+                .fetchOne(0, int.class);
+    }
+
+
+    /**
      * 새로운 할 일을 저장합니다.
      * sequence가 null인 경우 해당 사용자의 최대 sequence + 1로 자동 설정됩니다.
      * 
@@ -64,6 +137,7 @@ public class TodosRepository {
                 .set(TODOS.COLOR, todoPojo.getColor())
                 .set(TODOS.SEQUENCE, sequence)
                 .set(TODOS.DUE_AT, todoPojo.getDueAt())
+                .set(TODOS.CREATED_AT, todoPojo.getCreatedAt())
                 .returning(TODOS.TODO_ID) 
                 .fetchOne()
                 .getUserNo();
@@ -121,6 +195,40 @@ public class TodosRepository {
 
         return dslContext.update(TODOS)
                 .set(todosRecord)
+                .where(TODOS.TODO_ID.eq(todoId))
+                .execute();
+    }
+
+
+    /**
+     * 기존 할 일 순서를 업데이트합니다.
+     * 
+     * @param todoId 업데이트할 Todo ID
+     * @param sequence 업데이트할 순서
+     * 
+     * @return 업데이트된 레코드 수 (0: 변경사항 없음, 1: 업데이트 성공)
+     * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
+     */
+    public int updateSequence(String todoId, int sequence) {
+        return dslContext.update(TODOS)
+                .set(TODOS.SEQUENCE, sequence)
+                .where(TODOS.TODO_ID.eq(todoId))
+                .execute();
+    }
+
+
+    /**
+     * 기존 할 일 완료 날짜(=유무)를 업데이트합니다.
+     * 
+     * @param todoId 업데이트할 Todo ID
+     * @param completedAt 업데이트 완료 날짜(=유무)
+     * 
+     * @return 업데이트된 레코드 수 (0: 변경사항 없음, 1: 업데이트 성공)
+     * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
+     */
+    public int updateCompletedAt(String todoId, LocalDateTime completedAt) {
+        return dslContext.update(TODOS)
+                .set(TODOS.COMPLETED_AT, completedAt)
                 .where(TODOS.TODO_ID.eq(todoId))
                 .execute();
     }

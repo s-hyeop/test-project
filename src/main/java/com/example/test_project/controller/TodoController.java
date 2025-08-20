@@ -120,10 +120,10 @@ public class TodoController {
     @ApiResponse(responseCode = "200", description = "성공적으로 통계 조회됨")
     // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
     @GetMapping("/statistics")
-    public ResponseEntity<TodoStatisticsResponse> getTodoStatistics(@PathVariable String todoId) {
+    public ResponseEntity<TodoStatisticsResponse> getTodoStatistics() {
         int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
 
-        TodoStatisticsResponse todoStatisticsResponse = todoService.getTodoStatistics(userNo, todoId);
+        TodoStatisticsResponse todoStatisticsResponse = todoService.getTodoStatistics(userNo);
         return ResponseEntity.ok().body(todoStatisticsResponse);
     }
 
