@@ -57,15 +57,4 @@ public class UserService {
         }
     }
 
-    //     public List<UserDetailResponse> getUserDetails() {
-    //     List<UserDetailRow> rows = usersRepository.findAllDetails();
-    //     return rows.stream()
-    //                .map(r -> UserDetailResponse.builder()
-    //                        .userName(r.userName())
-    //                        .email(r.email())
-    //                        .createdAt(r.createdAt())
-    //                        .build())
-    //                .toList();
-    // }
-
 }
