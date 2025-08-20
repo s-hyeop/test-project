@@ -16,13 +16,15 @@ public class Tokens implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final Integer tokenNo;
-    private final Integer userNo;
-    private final String refreshToken;
-    private final String clientOs;
-    private final LocalDateTime accessTokenExpiresAt;
-    private final LocalDateTime refreshTokenExpiresAt;
-    private final LocalDateTime createdAt;
+    private Integer tokenNo;
+    private Integer userNo;
+    private String refreshToken;
+    private String clientOs;
+    private LocalDateTime accessTokenExpiresAt;
+    private LocalDateTime refreshTokenExpiresAt;
+    private LocalDateTime createdAt;
+
+    public Tokens() {}
 
     public Tokens(Tokens value) {
         this.tokenNo = value.tokenNo;
@@ -60,10 +62,26 @@ public class Tokens implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.tokens.token_no</code>.
+     */
+    public Tokens setTokenNo(Integer tokenNo) {
+        this.tokenNo = tokenNo;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.tokens.user_no</code>.
      */
     public Integer getUserNo() {
         return this.userNo;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.tokens.user_no</code>.
+     */
+    public Tokens setUserNo(Integer userNo) {
+        this.userNo = userNo;
+        return this;
     }
 
     /**
@@ -74,10 +92,26 @@ public class Tokens implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.tokens.refresh_token</code>.
+     */
+    public Tokens setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.tokens.client_os</code>.
      */
     public String getClientOs() {
         return this.clientOs;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.tokens.client_os</code>.
+     */
+    public Tokens setClientOs(String clientOs) {
+        this.clientOs = clientOs;
+        return this;
     }
 
     /**
@@ -88,6 +122,14 @@ public class Tokens implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.tokens.access_token_expires_at</code>.
+     */
+    public Tokens setAccessTokenExpiresAt(LocalDateTime accessTokenExpiresAt) {
+        this.accessTokenExpiresAt = accessTokenExpiresAt;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.tokens.refresh_token_expires_at</code>.
      */
     public LocalDateTime getRefreshTokenExpiresAt() {
@@ -95,10 +137,26 @@ public class Tokens implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.tokens.refresh_token_expires_at</code>.
+     */
+    public Tokens setRefreshTokenExpiresAt(LocalDateTime refreshTokenExpiresAt) {
+        this.refreshTokenExpiresAt = refreshTokenExpiresAt;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.tokens.created_at</code>.
      */
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.tokens.created_at</code>.
+     */
+    public Tokens setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
     }
 
     @Override

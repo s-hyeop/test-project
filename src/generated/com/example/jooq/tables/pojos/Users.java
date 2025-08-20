@@ -16,14 +16,16 @@ public class Users implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final Integer userNo;
-    private final String email;
-    private final String password;
-    private final String userName;
-    private final String role;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime deletedAt;
-    private final LocalDateTime lastLoginAt;
+    private Integer userNo;
+    private String email;
+    private String password;
+    private String userName;
+    private String role;
+    private LocalDateTime createdAt;
+    private LocalDateTime deletedAt;
+    private LocalDateTime lastLoginAt;
+
+    public Users() {}
 
     public Users(Users value) {
         this.userNo = value.userNo;
@@ -64,10 +66,26 @@ public class Users implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.users.user_no</code>.
+     */
+    public Users setUserNo(Integer userNo) {
+        this.userNo = userNo;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.users.email</code>.
      */
     public String getEmail() {
         return this.email;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.users.email</code>.
+     */
+    public Users setEmail(String email) {
+        this.email = email;
+        return this;
     }
 
     /**
@@ -78,10 +96,26 @@ public class Users implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.users.password</code>.
+     */
+    public Users setPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.users.user_name</code>.
      */
     public String getUserName() {
         return this.userName;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.users.user_name</code>.
+     */
+    public Users setUserName(String userName) {
+        this.userName = userName;
+        return this;
     }
 
     /**
@@ -92,10 +126,26 @@ public class Users implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.users.role</code>.
+     */
+    public Users setRole(String role) {
+        this.role = role;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.users.created_at</code>.
      */
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.users.created_at</code>.
+     */
+    public Users setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
     }
 
     /**
@@ -106,10 +156,26 @@ public class Users implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.users.deleted_at</code>.
+     */
+    public Users setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.users.last_login_at</code>.
      */
     public LocalDateTime getLastLoginAt() {
         return this.lastLoginAt;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.users.last_login_at</code>.
+     */
+    public Users setLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+        return this;
     }
 
     @Override

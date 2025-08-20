@@ -17,16 +17,18 @@ public class Todos implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final String todoId;
-    private final Integer userNo;
-    private final String title;
-    private final String content;
-    private final String color;
-    private final Integer sequence;
-    private final LocalDate dueAt;
-    private final LocalDateTime completedAt;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private String todoId;
+    private Integer userNo;
+    private String title;
+    private String content;
+    private String color;
+    private Integer sequence;
+    private LocalDate dueAt;
+    private LocalDateTime completedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public Todos() {}
 
     public Todos(Todos value) {
         this.todoId = value.todoId;
@@ -73,10 +75,26 @@ public class Todos implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.todos.todo_id</code>.
+     */
+    public Todos setTodoId(String todoId) {
+        this.todoId = todoId;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.todos.user_no</code>.
      */
     public Integer getUserNo() {
         return this.userNo;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.todos.user_no</code>.
+     */
+    public Todos setUserNo(Integer userNo) {
+        this.userNo = userNo;
+        return this;
     }
 
     /**
@@ -87,10 +105,26 @@ public class Todos implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.todos.title</code>.
+     */
+    public Todos setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.todos.content</code>.
      */
     public String getContent() {
         return this.content;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.todos.content</code>.
+     */
+    public Todos setContent(String content) {
+        this.content = content;
+        return this;
     }
 
     /**
@@ -101,10 +135,26 @@ public class Todos implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.todos.color</code>.
+     */
+    public Todos setColor(String color) {
+        this.color = color;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.todos.sequence</code>.
      */
     public Integer getSequence() {
         return this.sequence;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.todos.sequence</code>.
+     */
+    public Todos setSequence(Integer sequence) {
+        this.sequence = sequence;
+        return this;
     }
 
     /**
@@ -115,10 +165,26 @@ public class Todos implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.todos.due_at</code>.
+     */
+    public Todos setDueAt(LocalDate dueAt) {
+        this.dueAt = dueAt;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.todos.completed_at</code>.
      */
     public LocalDateTime getCompletedAt() {
         return this.completedAt;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.todos.completed_at</code>.
+     */
+    public Todos setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
+        return this;
     }
 
     /**
@@ -129,10 +195,26 @@ public class Todos implements Serializable {
     }
 
     /**
+     * Setter for <code>songseunghyeop.todos.created_at</code>.
+     */
+    public Todos setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    /**
      * Getter for <code>songseunghyeop.todos.updated_at</code>.
      */
     public LocalDateTime getUpdatedAt() {
         return this.updatedAt;
+    }
+
+    /**
+     * Setter for <code>songseunghyeop.todos.updated_at</code>.
+     */
+    public Todos setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+        return this;
     }
 
     @Override

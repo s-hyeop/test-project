@@ -37,10 +37,8 @@ jooq {
 					}
 
 					generate {
-						daos = false
 						records = false
 						pojos = true
-						immutablePojos = true
 						fluentSetters = true
 						javaTimeTypes = true
 						deprecated = false
