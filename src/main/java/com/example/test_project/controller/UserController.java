@@ -13,10 +13,12 @@ import com.example.test_project.dto.request.UserPatchRequest;
 import com.example.test_project.dto.response.UserDetailResponse;
 import com.example.test_project.service.UserService;
 import com.example.test_project.util.AuthUtil;
+import com.example.test_project.util.RateLimitUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+    private final RateLimitUtil rateLimitUtil;
 
 
 
@@ -55,7 +58,8 @@ public class UserController {
 
     @PatchMapping("/change-password")
     @Operation(summary = "비밀번호 변경", description = "로그인한 사용자의 비밀번호를 변경합니다. 기존 비밀번호 검증 후 새 비밀번호를 저장합니다.")
-    public ResponseEntity<Void> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest) {
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest, HttpServletRequest request) {
+        rateLimitUtil.checkRateLimit(request);
         Integer userNo = AuthUtil.currentUserNo();
 
         userService.changePassword(userNo, userChangePasswordRequest);

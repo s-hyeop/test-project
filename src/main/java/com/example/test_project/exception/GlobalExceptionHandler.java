@@ -8,6 +8,8 @@ import org.jooq.exception.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +21,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import com.example.test_project.dto.response.ErrorResponse;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +45,7 @@ public class GlobalExceptionHandler {
     }
 
     // 401 Unauthorized
-    @ExceptionHandler(UnauthorizedException.class)
+    @ExceptionHandler({UnauthorizedException.class, AuthenticationException.class, JwtException.class})
     public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException e, WebRequest request) {
         log.debug("UnauthorizedException: {}", e.getMessage());
         return ResponseEntity
@@ -57,7 +60,7 @@ public class GlobalExceptionHandler {
     }
 
     // 403 Forbidden
-    @ExceptionHandler(ForbiddenException.class)
+    @ExceptionHandler({ForbiddenException.class})
     public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException e, WebRequest request) {
         log.debug("ForbiddenException: {}", e.getMessage());
         return ResponseEntity
@@ -70,6 +73,22 @@ public class GlobalExceptionHandler {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build());
     }
+
+    // AuthorizationDeniedException
+    @ExceptionHandler({AuthorizationDeniedException.class})
+    public ResponseEntity<ErrorResponse> handleForbidden(AuthorizationDeniedException e, WebRequest request) {
+        log.debug("AuthorizationDeniedException: {}", e.getMessage());
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .message(e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build());
+    }
+
 
     // 404 Not Found
     @ExceptionHandler(NotFoundException.class)
@@ -100,6 +119,23 @@ public class GlobalExceptionHandler {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build());
     }
+
+
+    // 429 Too Many Request
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorResponse> handleMessageNotReadable(TooManyRequestsException e, WebRequest request) {
+        log.debug("TooManyRequestsException: {}", e.getMessage());
+        return ResponseEntity
+            .status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+                .error(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase())
+                .message(e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build());
+    }
+
 
     // 500 Internal Server Error
     @ExceptionHandler(InternalServerException.class)

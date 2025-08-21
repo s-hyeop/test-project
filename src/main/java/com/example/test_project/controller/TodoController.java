@@ -23,10 +23,12 @@ import com.example.test_project.dto.response.TodoListResponse;
 import com.example.test_project.dto.response.TodoStatisticsResponse;
 import com.example.test_project.service.TodoService;
 import com.example.test_project.util.AuthUtil;
+import com.example.test_project.util.RateLimitUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 public class TodoController {
 
     private final TodoService todoService;
+    private final RateLimitUtil rateLimitUtil;
 
 
 
@@ -68,7 +71,8 @@ public class TodoController {
     @PostMapping("")
     @Operation(summary = "TODO 등록", description = "새로운 TODO을 등록합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 TODO 등록됨")
-    public ResponseEntity<TodoCreateResponse> createTodo(@Valid @RequestBody TodoCreateRequest todoCreateRequest) {
+    public ResponseEntity<TodoCreateResponse> createTodo(@Valid @RequestBody TodoCreateRequest todoCreateRequest, HttpServletRequest request) {
+        rateLimitUtil.checkRateLimit(request);
         Integer userNo = AuthUtil.currentUserNo();
 
         TodoCreateResponse todoCreateResponse = todoService.createTodo(userNo, todoCreateRequest);
