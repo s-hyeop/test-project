@@ -231,6 +231,14 @@ public class AuthService {
             new NotFoundException("사용자를 찾을 수 없습니다.")
         );
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiresAt = tokenPojo.getAccessTokenExpiresAt();
+        LocalDateTime refreshAvailableAt = expiresAt.minusMinutes(3);
+
+        if (now.isBefore(refreshAvailableAt)) {
+            throw new BadRequestException("아직 갱신할 수 없습니다.");
+        }
+
         Tokens updateTokenPojo = new Tokens();
         updateTokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(accessExpirationMinutes, ChronoUnit.MINUTES));
 
