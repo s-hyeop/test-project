@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class EmailValidateRequest {
+public class EmailRequest {
 
     @Schema(description = "회원 이메일 주소", example = "user@example.com")
     @NotBlank(message = "이메일은 비어 있을 수 없습니다.")
