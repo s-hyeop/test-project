@@ -1,5 +1,6 @@
 package com.example.test_project.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.jooq.tables.pojos.Users;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserDetailResponse getUserDetail(int userNo) {
         Users userPojo = usersRepository.find(userNo).orElseThrow(() ->
@@ -46,14 +48,15 @@ public class UserService {
             new RuntimeException("회원을 찾을 수 없음.")  // TODO: 예외 후처리 필요
         );
         
-        // DOTO: Spring Security 작업 후 해싱 처리 및 비교 추가 필요
-        if (userChangePasswordRequest.getPassword() != userPojo.getPassword()) {
+
+        if (!passwordEncoder.matches(userChangePasswordRequest.getPassword(), userPojo.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않음."); // TODO: 예외 후처리 필요
         }
-        String passwordHash = userChangePasswordRequest.getNewPassword(); // TODO: Spring Security 작업 후
+
+        String hashPassword = passwordEncoder.encode(userChangePasswordRequest.getNewPassword());
 
         Users updateUserPojo = new Users();
-        updateUserPojo.setPassword(passwordHash);
+        updateUserPojo.setPassword(hashPassword);
 
         if (usersRepository.update(userNo, updateUserPojo) == 0) {
             throw new RuntimeException("비밀번호 변경에 실패했음"); // TODO: 예외 후처리 필요

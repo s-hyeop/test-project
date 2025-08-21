@@ -1,8 +1,14 @@
 package com.example.test_project.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.jooq.tables.pojos.Tokens;
@@ -20,9 +26,12 @@ import com.example.test_project.dto.response.EmailExistResponse;
 import com.example.test_project.dto.response.RefreshTokenDetailResponse;
 import com.example.test_project.repository.TokensRepository;
 import com.example.test_project.repository.UsersRepository;
+import com.example.test_project.security.CustomUserDetails;
+import com.example.test_project.security.JwtTokenProvider;
 import com.example.test_project.util.AuthUtil;
 import com.example.test_project.util.EmailUtil;
 import com.example.test_project.util.RedisUtil;
+import com.example.test_project.util.UuidUtil;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +42,17 @@ public class AuthService {
 
     private final UsersRepository usersRepository;
     private final TokensRepository tokensRepository;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwt;
     private final EmailUtil emailUtil;
     private final RedisUtil redisUtil;
+
+    @Value("${jwt.access-expiration-minutes}")
+    private int accessExpirationMinutes;
+
+    @Value("${jwt.refresh-expiration-minutes}")
+    private int refreshExpirationMinutes;
 
     public EmailExistResponse existsByEmail(EmailRequest emailRequest) {
         // 계정이 없으면 true, 계정이 있으면 false
@@ -45,14 +63,30 @@ public class AuthService {
             .build();
     }
 
-    public AccessTokenResponse login(LoginRequest loginRequest) {
-        // TODO: Spring Security Login
+    public AccessTokenResponse login(LoginRequest loginRequest, String ClientOs) {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
+        Authentication authentication = authenticationManager.authenticate(auth);
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal(); 
 
-        // TODO: 토큰 발급
+        String accessToken = jwt.generateAccessToken(customUserDetails.getUserNo(), customUserDetails.getEmail(), customUserDetails.getRole());
+        String refreshToken = UuidUtil.generateUuidV7();
 
-        // TODO: 토큰 DB 반영
-        
-        return AccessTokenResponse.builder().build();
+        Tokens tokenPojo = new Tokens();
+        tokenPojo.setUserNo(customUserDetails.getUserNo());
+        tokenPojo.setRefreshToken(refreshToken);
+        tokenPojo.setClientOs(ClientOs); // TODO: ...
+        tokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(accessExpirationMinutes, ChronoUnit.MINUTES));
+        tokenPojo.setRefreshTokenExpiresAt(LocalDateTime.now().plus(refreshExpirationMinutes, ChronoUnit.MINUTES));
+        tokenPojo.setCreatedAt(LocalDateTime.now());
+
+        if (tokensRepository.save(tokenPojo) == null) {
+            throw new RuntimeException("토큰 할당에 실패");
+        }
+
+        return AccessTokenResponse.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .build();
     }
 
     public void sendSignupCode(SignupCodeSendRequest signupCodeSendRequest) {
@@ -152,11 +186,11 @@ public class AuthService {
         redisUtil.deleteResetPasswordKey(resetPasswordRequest.getEmail());
 
         // 새로운 비밀번호 해싱
-        String passwordHash = resetPasswordRequest.getPassword(); // TODO: Spring Security 작업 후
+        String hashPassword = passwordEncoder.encode(resetPasswordRequest.getPassword());
 
         // 변경할 비밀번호 pojo에 반영
         Users updateUserPojo = new Users();
-        updateUserPojo.setPassword(passwordHash);
+        updateUserPojo.setPassword(hashPassword);
 
         // 업데이트 진행
         if (usersRepository.update(userPojo.getUserNo(), updateUserPojo) == 0) {
@@ -175,14 +209,27 @@ public class AuthService {
             ).toList();
     }
 
-    public AccessTokenResponse refreshAccessToken(int userNo, String refreshToken) {
-        // 토큰 검토
-        
-        // TODO: 토큰 발급
+    public AccessTokenResponse refreshAccessToken(String refreshToken) {
+        Tokens tokenPojo = tokensRepository.findByRefreshToken(refreshToken).orElseThrow(() -> 
+            new RuntimeException("토큰을 찾을 수 없음") // TODO: 예외 후처리 필요
+        );
 
-        // TODO: 토큰 DB 반영
+        Users userPojo = usersRepository.find(tokenPojo.getUserNo()).orElseThrow(() -> 
+            new RuntimeException("사용자를 찾을 수 없음") // TODO: 예외 후처리 필요
+        );
 
-        return AccessTokenResponse.builder().build();
+        Tokens updateTokenPojo = new Tokens();
+        updateTokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(accessExpirationMinutes, ChronoUnit.MINUTES));
+
+        if (tokensRepository.update(tokenPojo.getTokenNo(), updateTokenPojo) == 0) {
+            throw new RuntimeException("토큰 할당에 실패");
+        }
+
+        String accessToken = jwt.generateAccessToken(userPojo.getUserNo(), userPojo.getEmail(), userPojo.getRole());
+
+        return AccessTokenResponse.builder()
+            .accessToken(accessToken)
+            .build();
     }
 
     public void deleteToken(int userNo, String refreshToken) {

@@ -2,6 +2,10 @@ package com.example.test_project.util;
 
 import java.security.SecureRandom;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.example.test_project.security.CustomUserDetails;
+
 public class AuthUtil {
     private static final SecureRandom random = new SecureRandom();
 
@@ -11,4 +15,9 @@ public class AuthUtil {
         return String.format("%06d", number);  // 6자리 zero padding
     }
 
+    public static Integer currentUserNo() {
+        var a = SecurityContextHolder.getContext().getAuthentication();
+        if (a != null && a.getPrincipal() instanceof CustomUserDetails u) return u.getUserNo();
+        return null;
+    }
 }
