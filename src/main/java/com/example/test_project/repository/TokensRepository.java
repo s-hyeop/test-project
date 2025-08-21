@@ -1,5 +1,6 @@
 package com.example.test_project.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jooq.DSLContext;
@@ -31,6 +32,26 @@ public class TokensRepository {
                 .fetchOptionalInto(Tokens.class);
     }
 
+
+    /**
+     * 토큰으로 토큰 정보를 조회합니다.
+     * 
+     * @param tokenNo 조회할 토큰
+     * @return 토큰 정보를 담은 Optional 객체, 존재하지 않을 경우 Optional.empty()
+     */
+    public Optional<Tokens> findByRefreshToken(String refreshToken) {
+        return dslContext.selectFrom(TOKENS)
+                .where(TOKENS.REFRESH_TOKEN.eq(refreshToken))
+                .fetchOptionalInto(Tokens.class);
+    }
+
+
+    public List<Tokens> findAllActiveTokensByUserNo(int userNo) {
+        return dslContext.selectFrom(TOKENS)
+                .where(TOKENS.USER_NO.eq(userNo))
+                .orderBy(TOKENS.CREATED_AT.desc())
+                .fetchInto(Tokens.class);
+    }
 
     /**
      * 새로운 인증 토큰 정보를 저장합니다.
@@ -117,4 +138,18 @@ public class TokensRepository {
                 .execute();
     }
 
+
+    /**
+     * refreshToken 토큰 정보를 물리적으로 삭제합니다.
+     * 로그아웃 시 또는 토큰 무효화 시 호출됩니다.
+     * 
+     * @param refreshToken 삭제할 토큰
+     * @return 삭제된 레코드 수 (0: 해당 토큰 없음, 1: 삭제 성공)
+     * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
+     */
+    public int deleteByRefreshToken(String refreshToken) {
+        return dslContext.deleteFrom(TOKENS)
+                .where(TOKENS.REFRESH_TOKEN.eq(refreshToken))
+                .execute();
+    }
 }

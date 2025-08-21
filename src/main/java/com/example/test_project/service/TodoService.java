@@ -57,7 +57,7 @@ public class TodoService {
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
         }
 
         return TodoDetailResponse.builder()
@@ -86,7 +86,7 @@ public class TodoService {
         todoPojo.setCreatedAt(LocalDateTime.now());
 
         if (todosRepository.save(todoPojo) == 0) {
-            new RuntimeException("TODO 추가에 실패함."); // TODO: 예외 후처리 필요
+            throw new RuntimeException("TODO 추가에 실패함."); // TODO: 예외 후처리 필요
         }
 
         return TodoCreateResponse.builder()
@@ -100,7 +100,7 @@ public class TodoService {
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
         }
 
         Todos updateTodoPojo = new Todos();
@@ -111,7 +111,7 @@ public class TodoService {
         updateTodoPojo.setUpdatedAt(LocalDateTime.now());
 
         if (todosRepository.update(todoId, updateTodoPojo) == 0) {
-            new RuntimeException("TODO 수정에 실패함."); // TODO: 예외 후처리 필요
+            throw new RuntimeException("TODO 수정에 실패함."); // TODO: 예외 후처리 필요
         }
     }
 
@@ -122,7 +122,7 @@ public class TodoService {
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
         }
 
         if (todoPatchRequest.getSequence() != null) {
@@ -138,7 +138,7 @@ public class TodoService {
         }
 
         if (reslutCount == 0) {
-            new RuntimeException("TODO 수정에 실패함."); // TODO: 예외 후처리 필요
+            throw new RuntimeException("TODO 수정에 실패함."); // TODO: 예외 후처리 필요
         }
     }
 
@@ -148,11 +148,11 @@ public class TodoService {
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
         }
 
         if (todosRepository.delete(todoId) == 0) {
-            new RuntimeException("TODO 삭제에 실패함."); // TODO: 예외 후처리 필요
+            throw new RuntimeException("TODO 삭제에 실패함."); // TODO: 예외 후처리 필요
         }
     }
 

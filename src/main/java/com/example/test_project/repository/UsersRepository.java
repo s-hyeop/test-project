@@ -35,6 +35,19 @@ public class UsersRepository {
 
 
     /**
+     * 사용자 이메일로 사용자 정보를 조회합니다.
+     * 
+     * @param email 조회할 사용자 이메일
+     * @return 사용자 정보를 담은 Optional 객체, 존재하지 않을 경우 Optional.empty()
+     */
+    public Optional<Users> findByEmail(String email) {
+        return dslContext.selectFrom(USERS)
+                .where(USERS.EMAIL.eq(email))
+                .fetchOptionalInto(Users.class);
+    }
+
+
+    /**
      * 새로운 사용자 정보를 저장합니다.
      * 
      * @param userPojo 저장할 사용자 정보 객체

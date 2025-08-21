@@ -1,6 +1,7 @@
 package com.example.test_project.controller;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.test_project.dto.request.EmailValidateRequest;
+import com.example.test_project.dto.request.EmailRequest;
 import com.example.test_project.dto.request.LoginRequest;
 import com.example.test_project.dto.request.ResetPasswordCodeSendRequest;
 import com.example.test_project.dto.request.ResetPasswordCodeVerifyRequest;
@@ -19,6 +20,7 @@ import com.example.test_project.dto.request.SignupCodeSendRequest;
 import com.example.test_project.dto.request.SignupCodeVerifyRequest;
 import com.example.test_project.dto.request.SignupRequest;
 import com.example.test_project.dto.response.AccessTokenResponse;
+import com.example.test_project.dto.response.EmailExistResponse;
 import com.example.test_project.dto.response.RefreshTokenDetailResponse;
 import com.example.test_project.service.AuthService;
 
@@ -47,10 +49,10 @@ public class AuthController {
     @Operation(summary = "이메일 유효성 검사", description = "회원가입 시 이메일이 이미 사용 중인지 확인합니다.")
     @ApiResponse(responseCode = "200", description = "사용 가능한 이메일")
     // @PreAuthorize("isAnonymous()") // TODO: 권한 상태가 Anonymous 인가?
-    @PostMapping("/email/validate")
-    public ResponseEntity<Void> validateEmail(@Valid @RequestBody EmailValidateRequest emailValidateRequest) {
-        authService.validateEmail(emailValidateRequest);
-        return ResponseEntity.ok().build();
+    @PostMapping("/email/exist")
+    public ResponseEntity<EmailExistResponse> checkEmailExist(@Valid @RequestBody EmailRequest emailRequest) {
+        EmailExistResponse emailExistResponse = authService.existsByEmail(emailRequest);
+        return ResponseEntity.ok().body(emailExistResponse);
     }
 
 
@@ -133,11 +135,11 @@ public class AuthController {
     @Operation(summary = "RefreshToken 목록 조회", description = "로그인된 사용자의 RefreshToken 목록을 조회합니다.")
     // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
     @GetMapping("/tokens")
-    public ResponseEntity<RefreshTokenDetailResponse> getTokens() {
+    public ResponseEntity<List<RefreshTokenDetailResponse>> getTokens() {
         int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
 
-        RefreshTokenDetailResponse refreshTokenDetailResponse = authService.getTokens(userNo);
-        return ResponseEntity.ok().body(refreshTokenDetailResponse);
+        List<RefreshTokenDetailResponse> list = authService.getTokens(userNo);
+        return ResponseEntity.ok().body(list);
     }
 
 

@@ -48,7 +48,7 @@ public class TodosRepository {
     public List<Todos> findPageByUserNo(int userNo, int offset, int limit) {
         return dslContext.selectFrom(TODOS)
                 .where(TODOS.USER_NO.eq(userNo))
-                .orderBy(TODOS.TODO_ID.desc())
+                .orderBy(TODOS.SEQUENCE.asc())
                 .limit(limit)
                 .offset(offset)
                 .fetchInto(Todos.class);
