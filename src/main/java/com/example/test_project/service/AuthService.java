@@ -232,11 +232,15 @@ public class AuthService {
         );
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiresAt = tokenPojo.getAccessTokenExpiresAt();
-        LocalDateTime refreshAvailableAt = expiresAt.minusMinutes(3);
+        LocalDateTime accessExpiresAt = tokenPojo.getAccessTokenExpiresAt();
+        LocalDateTime accessAvailableAt = accessExpiresAt.minusMinutes(3);
 
-        if (now.isBefore(refreshAvailableAt)) {
-            throw new BadRequestException("아직 갱신할 수 없습니다.");
+        if (now.isBefore(accessAvailableAt)) {
+            throw new ConflictException("아직 갱신할 수 없습니다.");
+        }
+
+        if (now.isAfter(tokenPojo.getRefreshTokenExpiresAt())) {
+            throw new BadRequestException("로그인 토큰이 만료되었습니다.");
         }
 
         Tokens updateTokenPojo = new Tokens();
