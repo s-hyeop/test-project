@@ -1,0 +1,58 @@
+String dbHost = findProperty("DB_HOST")
+String dbPort = findProperty("DB_PORT")
+String dbSchema = findProperty("DB_SCHEMA")
+String dbUser = findProperty("DB_USER")
+String dbPass = findProperty("DB_PASS")
+
+jooq {
+	version = "${jooqVersion}"
+	configurations {
+		songseunghyeopDB {
+			generationTool {
+				jdbc {
+					driver = 'org.mariadb.jdbc.Driver'
+					url = "jdbc:mariadb://${dbHost}:${dbPort}"
+					user = "${dbUser}"
+					password = "${dbPass}"
+				}
+
+				generator {
+					name = 'org.jooq.codegen.DefaultGenerator'
+
+					database {
+						name = 'org.jooq.meta.mariadb.MariaDBDatabase'
+
+						schemata {
+							schema {
+								inputSchema = "${dbSchema}"
+							}
+						}
+
+						forcedTypes {
+							forcedType {
+								name = 'BOOLEAN'
+								includeTypes = '(?i:(TINY|SMALL|MEDIUM|BIG)?INT(UNSIGNED)?\\(1\\))'
+							}
+						}
+					}
+
+					generate {
+						records = true
+						pojos = true
+						fluentSetters = true
+						javaTimeTypes = true
+						deprecated = false
+					}
+
+					target {
+						packageName = "${group}.jooq"
+						directory   = "src/generated"
+						clean       = true
+					}
+
+                    strategy.name = 'jooq.custom.generator.JPrefixGeneratorStrategy'
+				}
+			}
+		}
+	}
+}
