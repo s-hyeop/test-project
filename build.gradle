@@ -52,6 +52,7 @@ dependencies {
 	implementation ('org.springframework.boot:spring-boot-starter-jooq') {
 		exclude group: 'org.jooq:jooq'
 	}
+	implementation 'org.springframework.boot:spring-boot-devtools'
 
 	implementation "org.jooq:jooq:${jooqVersion}"
     implementation "org.jooq:jooq-meta:${jooqVersion}"
@@ -66,7 +67,6 @@ dependencies {
 
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
