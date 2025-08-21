@@ -3,11 +3,8 @@ package com.example.test_project.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.management.RuntimeErrorException;
-
 import org.springframework.stereotype.Service;
 
-import com.example.jooq.tables.pojos.Todos;
 import com.example.jooq.tables.pojos.Tokens;
 import com.example.jooq.tables.pojos.Users;
 import com.example.test_project.dto.request.EmailRequest;
@@ -21,7 +18,6 @@ import com.example.test_project.dto.request.SignupRequest;
 import com.example.test_project.dto.response.AccessTokenResponse;
 import com.example.test_project.dto.response.EmailExistResponse;
 import com.example.test_project.dto.response.RefreshTokenDetailResponse;
-import com.example.test_project.dto.response.TodoCreateResponse;
 import com.example.test_project.repository.TokensRepository;
 import com.example.test_project.repository.UsersRepository;
 import com.example.test_project.util.AuthUtil;
