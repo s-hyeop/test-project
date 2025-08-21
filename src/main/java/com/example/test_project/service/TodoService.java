@@ -14,6 +14,9 @@ import com.example.test_project.dto.response.TodoCreateResponse;
 import com.example.test_project.dto.response.TodoDetailResponse;
 import com.example.test_project.dto.response.TodoListResponse;
 import com.example.test_project.dto.response.TodoStatisticsResponse;
+import com.example.test_project.exception.ForbiddenException;
+import com.example.test_project.exception.InternalServerException;
+import com.example.test_project.exception.NotFoundException;
 import com.example.test_project.repository.TodosRepository;
 import com.example.test_project.util.UuidUtil;
 
@@ -54,11 +57,11 @@ public class TodoService {
 
     public TodoDetailResponse getTodo(int userNo, String todoId) {
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
-            new RuntimeException("게시글을 찾을 수 없음") // TODO: 예외 후처리 필요
+            new NotFoundException("TODO를 찾을 수 없습니다.")
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new ForbiddenException("TODO 조회 권한이 없습니다.");
         }
 
         return TodoDetailResponse.builder()
@@ -87,7 +90,7 @@ public class TodoService {
         todoPojo.setCreatedAt(LocalDateTime.now());
 
         if (todosRepository.save(todoPojo) == null) {
-            throw new RuntimeException("TODO 추가에 실패함."); // TODO: 예외 후처리 필요
+            throw new InternalServerException("TODO 생성에 실패했습니다.");
         }
 
         return TodoCreateResponse.builder()
@@ -97,11 +100,11 @@ public class TodoService {
 
     public void updateTodo(int userNo, String todoId, TodoUpdateRequest todoUpdateRequest) {
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
-            new RuntimeException("게시글을 찾을 수 없음") // TODO: 예외 후처리 필요
+            new NotFoundException("TODO를 찾을 수 없습니다.")
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new ForbiddenException("TODO 수정 권한이 없습니다.");
         }
 
         Todos updateTodoPojo = new Todos();
@@ -112,18 +115,18 @@ public class TodoService {
         updateTodoPojo.setUpdatedAt(LocalDateTime.now());
 
         if (todosRepository.update(todoId, updateTodoPojo) == 0) {
-            throw new RuntimeException("TODO 수정에 실패함."); // TODO: 예외 후처리 필요
+            throw new InternalServerException("TODO 수정에 실패했습니다.");
         }
     }
 
     public void patchTodo(int userNo, String todoId, TodoPatchRequest todoPatchRequest) {
         int reslutCount = 0;
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
-            new RuntimeException("게시글을 찾을 수 없음") // TODO: 예외 후처리 필요
+            new NotFoundException("TODO를 찾을 수 없습니다.")
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new ForbiddenException("TODO 수정 권한이 없습니다.");
         }
 
         if (todoPatchRequest.getSequence() != null) {
@@ -139,21 +142,21 @@ public class TodoService {
         }
 
         if (reslutCount == 0) {
-            throw new RuntimeException("TODO 수정에 실패함."); // TODO: 예외 후처리 필요
+            throw new InternalServerException("TODO 수정에 실패했습니다.");
         }
     }
 
     public void deleteTodo(int userNo, String todoId) {
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
-            new RuntimeException("게시글을 찾을 수 없음") // TODO: 예외 후처리 필요
+            new NotFoundException("TODO를 찾을 수 없습니다.")
         );
 
         if (todoPojo.getUserNo() != userNo) {
-            throw new RuntimeException("사용자가 일치하지 않음"); // TODO: 예외 후처리 필요
+            throw new ForbiddenException("TODO 삭제 권한이 없습니다.");
         }
 
         if (todosRepository.delete(todoId) == 0) {
-            throw new RuntimeException("TODO 삭제에 실패함."); // TODO: 예외 후처리 필요
+            throw new InternalServerException("TODO 삭제에 실패했습니다.");
         }
     }
 

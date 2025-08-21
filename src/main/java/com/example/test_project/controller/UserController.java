@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
 @Tag(name = "사용자 API", description = "사용자 정보 조회 및 수정, 비밀번호 변경 API")
 public class UserController {
 
@@ -32,6 +31,7 @@ public class UserController {
 
 
     @GetMapping("")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "사용자 상세 조회", description = "로그인한 사용자의 상세 정보를 조회합니다. JWT 토큰에서 userNo를 추출하여 사용합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 사용자 정보 조회됨")
     public ResponseEntity<UserDetailResponse> getUserDetail() {
@@ -44,22 +44,24 @@ public class UserController {
 
 
     @PatchMapping("")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "사용자 정보 수정", description = "로그인한 사용자의 정보를 일부 수정합니다.")
     public ResponseEntity<Void> updateUser(@Valid @RequestBody UserPatchRequest userPatchRequest) {
         Integer userNo = AuthUtil.currentUserNo();
 
         userService.updateUser(userNo, userPatchRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
     @PatchMapping("/change-password")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "비밀번호 변경", description = "로그인한 사용자의 비밀번호를 변경합니다. 기존 비밀번호 검증 후 새 비밀번호를 저장합니다.")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest) {
         Integer userNo = AuthUtil.currentUserNo();
 
         userService.changePassword(userNo, userChangePasswordRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

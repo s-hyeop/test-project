@@ -21,10 +21,10 @@ public class JwtTokenProvider implements InitializingBean {
     private String secret;
 
     @Value("${jwt.access-expiration-minutes}")
-    private long accessExpireMinutes;
+    private int accessExpireMinutes;
 
     @Value("${jwt.refresh-expiration-minutes}")
-    private long refreshExpireMinutes;
+    private int refreshExpireMinutes;
 
     private SecretKey secretKey;
 

@@ -58,7 +58,7 @@ public class AuthController {
     private int refreshExpirationMinutes;
 
     @PostMapping("/email/exist")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "이메일 유효성 검사", description = "회원가입 시 이메일이 이미 사용 중인지 확인합니다.")
     @ApiResponse(responseCode = "200", description = "사용 가능한 이메일")
     public ResponseEntity<EmailExistResponse> checkEmailExist(@Valid @RequestBody EmailRequest emailRequest) {
@@ -69,7 +69,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 입력하여 Body로 AccessToken과 Cookie로 RefreshToken을 발급받습니다.")
     @ApiResponse(responseCode = "200", description = "로그인 성공, 토큰 반환")
     public ResponseEntity<AccessTokenResponse> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest req) {
@@ -84,67 +84,67 @@ public class AuthController {
 
 
     @PostMapping("/signup/code")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "회원가입 코드 발송", description = "회원가입을 위해 이메일로 인증 코드를 발송합니다.")
     public ResponseEntity<Void> sendSignupCode(@Valid @RequestBody SignupCodeSendRequest signupCodeSendRequest) {
         authService.sendSignupCode(signupCodeSendRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @PostMapping("/signup/verify")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "회원가입 코드 검증", description = "이메일로 발송된 인증 코드를 검증합니다.")
     public ResponseEntity<Void> verifySignupCode(@Valid @RequestBody SignupCodeVerifyRequest signupCodeVerifyRequest) {
         authService.verifySignupCode(signupCodeVerifyRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @PostMapping("/signup")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "회원가입", description = "이메일 및 인증 코드를 검증한 뒤 회원가입을 완료합니다.")
     public ResponseEntity<Void> signup(@Valid @RequestBody SignupRequest signupRequest) {
         authService.signup(signupRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @PostMapping("/reset-password/code")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "비밀번호 재설정 코드 발송", description = "비밀번호 재설정을 위해 이메일로 인증 코드를 발송합니다.")
     public ResponseEntity<Void> sendResetPasswordCode(@Valid @RequestBody ResetPasswordCodeSendRequest resetPasswordCodeSendRequest) {
         authService.sendResetPasswordCode(resetPasswordCodeSendRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @PostMapping("/reset-password/verify")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "비밀번호 재설정 코드 검증", description = "이메일로 발송된 비밀번호 재설정 코드를 검증합니다.")
     public ResponseEntity<Void> verifyResetPasswordCode(@Valid @RequestBody ResetPasswordCodeVerifyRequest resetPasswordCodeVerifyRequest) {
         authService.verifyResetPasswordCode(resetPasswordCodeVerifyRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @PostMapping("/reset-password")
-    @PreAuthorize("isAnonymous()")
+    @PreAuthorize("!isAuthenticated()")
     @Operation(summary = "비밀번호 재설정", description = "코드 검증이 완료된 사용자의 비밀번호를 재설정합니다.")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
         authService.resetPassword(resetPasswordRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @GetMapping("/tokens")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "RefreshToken 목록 조회", description = "로그인된 사용자의 RefreshToken 목록을 조회합니다.")
     public ResponseEntity<List<RefreshTokenDetailResponse>> getTokens() {
         Integer userNo = AuthUtil.currentUserNo();
@@ -156,7 +156,7 @@ public class AuthController {
 
 
     @PostMapping("/tokens/refresh")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken을 사용하여 새로운 AccessToken을 발급받습니다.")
     public ResponseEntity<AccessTokenResponse> refreshAccessToken(@CookieValue("${jwt.refresh-token-cookie-name}") String refreshToken) {
         AccessTokenResponse accessTokenResponse = authService.refreshAccessToken(refreshToken);
@@ -167,19 +167,19 @@ public class AuthController {
 
 
     @DeleteMapping("/tokens/{refreshToken}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "특정 RefreshToken 삭제", description = "사용자가 보유한 특정 RefreshToken을 삭제합니다.")
     public ResponseEntity<Void> deleteToken(@PathVariable String refreshToken) {
         Integer userNo = AuthUtil.currentUserNo();
 
         authService.deleteToken(userNo, refreshToken);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
 
     @DeleteMapping("/tokens/current")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('USER')")
     @Operation(summary = "현재 RefreshToken 삭제", description = "현재 로그인 세션에서 사용 중인 RefreshToken을 삭제합니다.")
     public ResponseEntity<Void> deleteCurrentToken(@CookieValue("${jwt.refresh-token-cookie-name}") String refreshToken) {
         Integer userNo = AuthUtil.currentUserNo();

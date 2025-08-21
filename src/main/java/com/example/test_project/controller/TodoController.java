@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/todos")
 @RequiredArgsConstructor
-@PreAuthorize("isAuthenticated()")
+@PreAuthorize("hasRole('USER')")
 @Tag(name = "DOTO API", description = "TODO CRUD 및 통계 API")
 public class TodoController {
 
@@ -84,7 +84,7 @@ public class TodoController {
         Integer userNo = AuthUtil.currentUserNo();
 
         todoService.updateTodo(userNo, todoId, todoUpdateRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -96,7 +96,7 @@ public class TodoController {
         Integer userNo = AuthUtil.currentUserNo();
 
         todoService.patchTodo(userNo, todoId, todoPatchRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -108,7 +108,7 @@ public class TodoController {
         Integer userNo = AuthUtil.currentUserNo();
 
         todoService.deleteTodo(userNo, todoId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 
