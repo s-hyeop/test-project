@@ -1,9 +1,13 @@
 package com.example.test_project.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.management.RuntimeErrorException;
 
 import org.springframework.stereotype.Service;
 
+import com.example.jooq.tables.pojos.Todos;
 import com.example.jooq.tables.pojos.Tokens;
 import com.example.jooq.tables.pojos.Users;
 import com.example.test_project.dto.request.EmailRequest;
@@ -17,9 +21,14 @@ import com.example.test_project.dto.request.SignupRequest;
 import com.example.test_project.dto.response.AccessTokenResponse;
 import com.example.test_project.dto.response.EmailExistResponse;
 import com.example.test_project.dto.response.RefreshTokenDetailResponse;
+import com.example.test_project.dto.response.TodoCreateResponse;
 import com.example.test_project.repository.TokensRepository;
 import com.example.test_project.repository.UsersRepository;
+import com.example.test_project.util.AuthUtil;
+import com.example.test_project.util.EmailUtil;
+import com.example.test_project.util.RedisUtil;
 
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,6 +37,8 @@ public class AuthService {
 
     private final UsersRepository usersRepository;
     private final TokensRepository tokensRepository;
+    private final EmailUtil emailUtil;
+    private final RedisUtil redisUtil;
 
     public EmailExistResponse existsByEmail(EmailRequest emailRequest) {
         // 계정이 없으면 true, 계정이 있으면 false
@@ -54,12 +65,25 @@ public class AuthService {
             throw new RuntimeException("이미 사용중인 이메일."); // TODO: 예외 후처리 필요
         }
 
-        // TODO: 이메일 발송
-        // TODO: redis 에 추가
+        // 인증 코드 생성
+        String code = AuthUtil.generateSixDigitCode();
+
+        // 이메일 발송
+        try {
+            emailUtil.sendEmail(signupCodeSendRequest.getEmail(), "회원가입 이메일 인증", code);
+        } catch (MessagingException e) {
+            throw new RuntimeException("이메일 발송에 실패 함");
+        }
+
+        // redis 에 추가
+        redisUtil.saveSignupKey(signupCodeSendRequest.getEmail(), code);
     }
 
     public void verifySignupCode(SignupCodeVerifyRequest signupCodeVerifyRequest) {
-        // TODO: redis 비교
+        // redis 이메일 인증 코드 검증
+        if (!redisUtil.verifySignupKey(signupCodeVerifyRequest.getEmail(), signupCodeVerifyRequest.getCode())) {
+            throw new RuntimeException("인증 번호가 올바르지 않음");
+        }
     }
 
     public void signup(SignupRequest signupRequest) {
@@ -68,8 +92,26 @@ public class AuthService {
             throw new RuntimeException("이미 사용중인 이메일."); // TODO: 예외 후처리 필요
         }
 
-        // TODO: redis 비교 -> 삭제
-        // TODO: 계정 추가
+        // redis 이메일 인증 코드 검증
+        if (!redisUtil.verifySignupKey(signupRequest.getEmail(), signupRequest.getCode())) {
+            throw new RuntimeException("인증 번호가 올바르지 않음");
+        }
+
+        // redis 검증 삭제
+        redisUtil.deleteSignupKey(signupRequest.getEmail());
+
+        // 회원 추가 pojo 생성
+        Users userPojo = new Users();
+        userPojo.setEmail(signupRequest.getEmail());
+        userPojo.setPassword(signupRequest.getPassword());
+        userPojo.setUserName(signupRequest.getUserName());
+        userPojo.setRole("USRE");
+        userPojo.setCreatedAt(LocalDateTime.now());
+
+        // 회원 추가 실패 확인
+        if (usersRepository.save(userPojo) == null) {
+            throw new RuntimeException("회원 추가에 실패함."); // TODO: 예외 후처리 필요
+        }
     }
 
     public void sendResetPasswordCode(ResetPasswordCodeSendRequest resetPasswordCodeSendRequest) {
@@ -78,12 +120,25 @@ public class AuthService {
             new RuntimeException("존재하지 않는 이메일.")  // TODO: 예외 후처리 필요
         );
 
-        // TODO: 이메일 발송
-        // TODO: redis에 추가
+        // 인증 코드 생성
+        String code = AuthUtil.generateSixDigitCode();
+
+        // 이메일 발송
+        try {
+            emailUtil.sendEmail(resetPasswordCodeSendRequest.getEmail(), "비밀번호 찾기 이메일 인증", code);
+        } catch (MessagingException e) {
+            throw new RuntimeException("이메일 발송에 실패 함");
+        }
+
+        // redis 에 추가
+        redisUtil.saveResetPasswordKey(resetPasswordCodeSendRequest.getEmail(), code);
     }
 
     public void verifyResetPasswordCode(ResetPasswordCodeVerifyRequest resetPasswordCodeVerifyRequest) {
-        // TODO: redis 비교
+        // redis 이메일 인증 코드 검증
+        if (!redisUtil.verifyResetPasswordKey(resetPasswordCodeVerifyRequest.getEmail(), resetPasswordCodeVerifyRequest.getCode())) {
+            throw new RuntimeException("인증 번호가 올바르지 않음");
+        }
     }
 
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
@@ -92,7 +147,13 @@ public class AuthService {
             new RuntimeException("존재하지 않는 이메일.")  // TODO: 예외 후처리 필요
         );
 
-        // TODO: redos 비교 -> 삭제
+        // redis 이메일 인증 코드 검증
+        if (!redisUtil.verifyResetPasswordKey(resetPasswordRequest.getEmail(), resetPasswordRequest.getCode())) {
+            throw new RuntimeException("인증 번호가 올바르지 않음");
+        }
+
+        // redis 검증 삭제
+        redisUtil.deleteResetPasswordKey(resetPasswordRequest.getEmail());
 
         // 새로운 비밀번호 해싱
         String passwordHash = resetPasswordRequest.getPassword(); // TODO: Spring Security 작업 후

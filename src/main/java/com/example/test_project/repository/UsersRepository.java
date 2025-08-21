@@ -62,7 +62,7 @@ public class UsersRepository {
      * @return 생성된 사용자의 번호 (userNo)
      * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
      */
-    public int save(Users userPojo) {
+    public Integer save(Users userPojo) {
         return dslContext.insertInto(USERS)
                 .set(USERS.EMAIL, userPojo.getEmail())
                 .set(USERS.PASSWORD, userPojo.getPassword())

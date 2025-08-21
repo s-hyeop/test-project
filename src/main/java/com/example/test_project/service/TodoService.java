@@ -15,6 +15,7 @@ import com.example.test_project.dto.response.TodoDetailResponse;
 import com.example.test_project.dto.response.TodoListResponse;
 import com.example.test_project.dto.response.TodoStatisticsResponse;
 import com.example.test_project.repository.TodosRepository;
+import com.example.test_project.util.UuidUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -75,7 +76,7 @@ public class TodoService {
 
     public TodoCreateResponse createTodo(int userNo, TodoCreateRequest todoCreateRequest) {
         Todos todoPojo = new Todos();
-        String todoId = new String(); // TODO: UUID v7 추가 해야 함
+        String todoId = UuidUtil.generateUuidV7(); // UUID v7
 
         todoPojo.setTodoId(todoId);
         todoPojo.setUserNo(userNo);
@@ -85,7 +86,7 @@ public class TodoService {
         todoPojo.setDueAt(todoCreateRequest.getDueAt());
         todoPojo.setCreatedAt(LocalDateTime.now());
 
-        if (todosRepository.save(todoPojo) == 0) {
+        if (todosRepository.save(todoPojo) == null) {
             throw new RuntimeException("TODO 추가에 실패함."); // TODO: 예외 후처리 필요
         }
 

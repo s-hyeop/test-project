@@ -68,7 +68,7 @@ public class TokensRepository {
      * @return 생성된 토큰의 사용자 번호
      * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
      */
-    public int save(Tokens tokenPojo) {
+    public Integer save(Tokens tokenPojo) {
         return dslContext.insertInto(TOKENS)
                 .set(TOKENS.USER_NO, tokenPojo.getUserNo())
                 .set(TOKENS.REFRESH_TOKEN, tokenPojo.getRefreshToken())
@@ -78,7 +78,7 @@ public class TokensRepository {
                 .set(TOKENS.CREATED_AT, tokenPojo.getCreatedAt())
                 .returning(TOKENS.TOKEN_NO) 
                 .fetchOne()
-                .getUserNo();
+                .getTokenNo();
     }
 
 
