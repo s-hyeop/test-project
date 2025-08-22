@@ -1,4 +1,4 @@
-package com.example.test_project.security;
+package com.example.test_project.config.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

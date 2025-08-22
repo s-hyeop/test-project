@@ -1,16 +1,12 @@
 package com.example.test_project.controller;
 
 import java.time.Duration;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,9 +20,7 @@ import com.example.test_project.dto.request.SignupCodeVerifyRequest;
 import com.example.test_project.dto.request.SignupRequest;
 import com.example.test_project.dto.response.AccessTokenResponse;
 import com.example.test_project.dto.response.EmailExistResponse;
-import com.example.test_project.dto.response.RefreshTokenDetailResponse;
 import com.example.test_project.service.AuthService;
-import com.example.test_project.util.AuthUtil;
 import com.example.test_project.util.OsDetectorUtil;
 import com.example.test_project.util.RateLimitUtil;
 
@@ -39,12 +33,12 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "인증 API", description = "회원가입, 로그인, 토큰 관리 등의 인증 관련 API")
 @RequiredArgsConstructor
+@PreAuthorize("!isAuthenticated()")
+@Tag(name = "인증 API", description = "회원가입, 로그인, 토큰 관리 등의 인증 관련 API")
 public class AuthController {
 
     private final AuthService authService;
@@ -154,57 +148,6 @@ public class AuthController {
     }
 
 
-
-    @GetMapping("/tokens")
-    @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "RefreshToken 목록 조회", description = "로그인된 사용자의 RefreshToken 목록을 조회합니다.")
-    public ResponseEntity<List<RefreshTokenDetailResponse>> getTokens() {
-        Integer userNo = AuthUtil.currentUserNo();
-
-        List<RefreshTokenDetailResponse> list = authService.getTokens(userNo);
-        return ResponseEntity.ok().body(list);
-    }
-
-
-
-    @PostMapping("/tokens/refresh")
-    @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "AccessToken 재발급", description = "RefreshToken을 사용하여 새로운 AccessToken을 발급받습니다.")
-    public ResponseEntity<AccessTokenResponse> refreshAccessToken(@CookieValue("${jwt.refresh-token-cookie-name}") String refreshToken, HttpServletRequest request) {
-        rateLimitUtil.checkRateLimit(request);
-        AccessTokenResponse accessTokenResponse = authService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok()
-            .body(accessTokenResponse);
-    }
-
-
-
-    @DeleteMapping("/tokens/{refreshToken}")
-    @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "특정 RefreshToken 삭제", description = "사용자가 보유한 특정 RefreshToken을 삭제합니다.")
-    public ResponseEntity<Void> deleteToken(@PathVariable String refreshToken) {
-        Integer userNo = AuthUtil.currentUserNo();
-
-        authService.deleteToken(userNo, refreshToken);
-        return ResponseEntity.noContent().build();
-    }
-
-
-
-    @DeleteMapping("/tokens/current")
-    @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "현재 RefreshToken 삭제", description = "현재 로그인 세션에서 사용 중인 RefreshToken을 삭제합니다.")
-    public ResponseEntity<Void> deleteCurrentToken(@CookieValue("${jwt.refresh-token-cookie-name}") String refreshToken) {
-        Integer userNo = AuthUtil.currentUserNo();
-        
-        authService.deleteToken(userNo, refreshToken);
-        return ResponseEntity.noContent()
-            .header(HttpHeaders.SET_COOKIE, removeRefreshTokenCookie().toString())
-            .build();
-    }
-
-
-
     private ResponseCookie generateRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from(rtCookieName, refreshToken)
             .httpOnly(true)
@@ -212,16 +155,6 @@ public class AuthController {
             .sameSite("None")
             .path("/")
             .maxAge(Duration.ofMinutes(refreshExpirationMinutes))
-            .build();
-    }
-
-    private ResponseCookie removeRefreshTokenCookie() {
-        return ResponseCookie.from(rtCookieName, "")
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None")
-            .path("/")
-            .maxAge(0)
             .build();
     }
 

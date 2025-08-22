@@ -1,4 +1,4 @@
-package com.example.test_project.security;
+package com.example.test_project.config.security;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.test_project.exception;
+package com.example.test_project.config.exception;
 
 // 400 Bad Request - 잘못된 요청
 public class BadRequestException extends RuntimeException {

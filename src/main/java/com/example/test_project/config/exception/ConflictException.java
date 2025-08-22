@@ -1,4 +1,4 @@
-package com.example.test_project.exception;
+package com.example.test_project.config.exception;
 
 // 409 Conflict - 중복 등 충돌
 public class ConflictException extends RuntimeException {

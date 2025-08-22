@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class TodoCreateRequest {
     private String color;
 
     @Schema(description = "마감일", example = "2025-12-31")
-    @NotBlank(message = "마감일은 비어 있을 수 없습니다.")
+    @NotNull(message = "마감일은 비어 있을 수 없습니다.")
     private LocalDate dueAt;
 
 }

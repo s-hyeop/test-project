@@ -123,7 +123,7 @@ public class TodosRepository {
      * @return 생성된 Todo의 사용자 번호
      * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
      */
-    public Integer save(Todos todoPojo) {
+    public String save(Todos todoPojo) {
         Integer sequence = todoPojo.getSequence();
         if (sequence == null) {
             sequence = getNextSequence(todoPojo.getUserNo());
@@ -140,7 +140,7 @@ public class TodosRepository {
                 .set(TODOS.CREATED_AT, todoPojo.getCreatedAt())
                 .returning(TODOS.TODO_ID) 
                 .fetchOne()
-                .getUserNo();
+                .getTodoId();
     }
 
 

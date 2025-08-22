@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.example.test_project.security.CustomUserDetails;
+import com.example.test_project.config.security.CustomUserDetails;
 
 public class AuthUtil {
     private static final SecureRandom random = new SecureRandom();

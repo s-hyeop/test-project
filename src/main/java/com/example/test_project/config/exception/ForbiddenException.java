@@ -1,4 +1,4 @@
-package com.example.test_project.exception;
+package com.example.test_project.config.exception;
 
 // 403 Forbidden - 권한 없음
 public class ForbiddenException extends RuntimeException {
