@@ -35,7 +35,7 @@ public class TodoController {
 
     @GetMapping("")
     public ResponseEntity<TodoListResponse> getTodos(@Valid @ModelAttribute TodoListRequest todoListRequest) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         TodoListResponse todoListResponse = todoService.getTodos(userNo, todoListRequest);
         return ResponseEntity.ok().body(todoListResponse);
@@ -45,7 +45,7 @@ public class TodoController {
 
     @GetMapping("/{todoId}")
     public ResponseEntity<TodoDetailResponse> getTodo(@PathVariable String todoId) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         TodoDetailResponse todoDetailResponse = todoService.getTodo(userNo, todoId);
         return ResponseEntity.ok().body(todoDetailResponse);
@@ -56,7 +56,7 @@ public class TodoController {
     @PostMapping("")
     public ResponseEntity<TodoCreateResponse> createTodo(@Valid @RequestBody TodoCreateRequest todoCreateRequest, HttpServletRequest request) {
         rateLimitUtil.checkRateLimit(request);
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         TodoCreateResponse todoCreateResponse = todoService.createTodo(userNo, todoCreateRequest);
         return ResponseEntity.ok().body(todoCreateResponse);
@@ -66,7 +66,7 @@ public class TodoController {
 
     @PutMapping("/{todoId}")
     public ResponseEntity<Void> updateTodo(@PathVariable String todoId, @Valid @RequestBody TodoUpdateRequest todoUpdateRequest) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         todoService.updateTodo(userNo, todoId, todoUpdateRequest);
         return ResponseEntity.noContent().build();
@@ -76,7 +76,7 @@ public class TodoController {
 
     @PatchMapping("/{todoId}")
     public ResponseEntity<Void> patchTodo(@PathVariable String todoId, @Valid @RequestBody TodoPatchRequest todoPatchRequest) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         todoService.patchTodo(userNo, todoId, todoPatchRequest);
         return ResponseEntity.noContent().build();
@@ -86,7 +86,7 @@ public class TodoController {
 
     @DeleteMapping("/{todoId}")
     public ResponseEntity<Void> deleteTodo(@PathVariable String todoId) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         todoService.deleteTodo(userNo, todoId);
         return ResponseEntity.noContent().build();
@@ -96,7 +96,7 @@ public class TodoController {
 
     @GetMapping("/statistics")
     public ResponseEntity<TodoStatisticsResponse> getTodoStatistics() {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         TodoStatisticsResponse todoStatisticsResponse = todoService.getTodoStatistics(userNo);
         return ResponseEntity.ok().body(todoStatisticsResponse);

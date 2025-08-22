@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping("")
     public ResponseEntity<UserDetailResponse> getUserDetail() {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         UserDetailResponse userDetailResponse = userService.getUserDetail(userNo);
         return ResponseEntity.ok().body(userDetailResponse);
@@ -41,7 +41,7 @@ public class UserController {
 
     @PatchMapping("")
     public ResponseEntity<Void> updateUser(@Valid @RequestBody UserPatchRequest userPatchRequest) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         userService.updateUser(userNo, userPatchRequest);
         return ResponseEntity.noContent().build();
@@ -51,7 +51,7 @@ public class UserController {
     @PatchMapping("/change-password")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest, HttpServletRequest request) {
         rateLimitUtil.checkRateLimit(request);
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         userService.changePassword(userNo, userChangePasswordRequest);
         return ResponseEntity.noContent().build();

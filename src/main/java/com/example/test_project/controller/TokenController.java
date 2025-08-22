@@ -36,7 +36,7 @@ public class TokenController {
     @GetMapping("")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<RefreshTokenDetailResponse>> getTokens() {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         List<RefreshTokenDetailResponse> list = authService.getTokens(userNo);
         return ResponseEntity.ok().body(list);
@@ -63,7 +63,7 @@ public class TokenController {
     @DeleteMapping("/{refreshToken}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteToken(@PathVariable String refreshToken) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
 
         authService.deleteToken(userNo, refreshToken);
         return ResponseEntity.noContent().build();
@@ -74,7 +74,7 @@ public class TokenController {
     @DeleteMapping("/current")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteCurrentToken(@CookieValue("${app.jwt-refresh-token-cookie-name}") String refreshToken) {
-        Integer userNo = AuthUtil.currentUserNo();
+        Integer userNo = AuthUtil.getCurrentUserNo();
         
         authService.deleteToken(userNo, refreshToken);
         return ResponseEntity.noContent()
