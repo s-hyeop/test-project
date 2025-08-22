@@ -2,7 +2,6 @@ package com.example.test_project.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,16 +10,10 @@ import lombok.Getter;
 @Builder
 public class TodoListRequest {
 
-    @Pattern(
-        regexp = "^(all|complete|incomplete)$",
-        message = "status 값은 all, complete, incomplete 중 하나여야 합니다."
-    )
+    // complete, incomplete
     private String status;
 
-    @Pattern(
-        regexp = "^(title|content)?$",
-        message = "searchType 값은 title, content 중 하나여야 합니다."
-    )
+    // title, content
     private String searchType;
 
     @Size(max = 100, message = "검색어는 100자 이하여야 합니다.")

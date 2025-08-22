@@ -42,10 +42,23 @@ public class TodoService {
      */
     @Transactional(readOnly = true)
     public TodoListResponse getTodos(int userNo, TodoListRequest todoListRequest) {
-        log.debug("TO-DO 목록 조회 시작 - userNo: {}, page: {}, size: {}", userNo, todoListRequest.getPage(), todoListRequest.getSize());
+        log.debug("TO-DO 목록 조회 시작 - userNo: {}, page: {}, size: {}, status: {}, searchType: {}, keyword: {}", 
+                userNo,
+                todoListRequest.getPage(),
+                todoListRequest.getSize(),
+                todoListRequest.getStatus(),
+                todoListRequest.getSearchType(),
+                todoListRequest.getKeyword()
+        );
 
         // 페이징된 TO-DO 목록 조회 (page는 0부터 시작하므로 -1)
-        List<Todos> todosPojo = todosRepository.findPageByUserNo(userNo, todoListRequest.getPage() - 1, todoListRequest.getSize());
+        List<Todos> todosPojo = todosRepository.findPageByUserNo(userNo, 
+                todoListRequest.getPage() - 1,
+                todoListRequest.getSize(),
+                todoListRequest.getStatus(),
+                todoListRequest.getSearchType(),
+                todoListRequest.getKeyword()
+        );
 
         // DTO 변환
         List<TodoDetailResponse> dtoList = todosPojo.stream()
@@ -62,8 +75,13 @@ public class TodoService {
                 .build()
             ).toList();
 
-        // 전체 개수 조회
-        int totalCount = todosRepository.countByUserNo(userNo);
+        // 개수 조회
+        int totalCount = todosRepository.countPageByUserNo(
+            userNo,
+            todoListRequest.getStatus(),
+            todoListRequest.getSearchType(),
+            todoListRequest.getKeyword()
+        );
 
         log.debug("TO-DO 목록 조회 완료 - userNo: {}, 조회된 항목 수: {}, 전체 개수: {}", userNo, dtoList.size(), totalCount);
 
