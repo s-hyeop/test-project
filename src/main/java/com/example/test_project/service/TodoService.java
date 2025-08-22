@@ -6,17 +6,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.jooq.tables.pojos.Todos;
-import com.example.test_project.config.exception.ForbiddenException;
-import com.example.test_project.config.exception.InternalServerException;
-import com.example.test_project.config.exception.NotFoundException;
-import com.example.test_project.dto.request.TodoCreateRequest;
-import com.example.test_project.dto.request.TodoListRequest;
-import com.example.test_project.dto.request.TodoPatchRequest;
-import com.example.test_project.dto.request.TodoUpdateRequest;
-import com.example.test_project.dto.response.TodoCreateResponse;
-import com.example.test_project.dto.response.TodoDetailResponse;
-import com.example.test_project.dto.response.TodoListResponse;
-import com.example.test_project.dto.response.TodoStatisticsResponse;
+import com.example.test_project.config.exception.*;
+import com.example.test_project.dto.request.*;
+import com.example.test_project.dto.response.*;
 import com.example.test_project.repository.TodosRepository;
 import com.example.test_project.util.UuidUtil;
 

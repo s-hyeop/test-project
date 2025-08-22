@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.test_project.dto.request.UserChangePasswordRequest;
-import com.example.test_project.dto.request.UserPatchRequest;
-import com.example.test_project.dto.response.UserDetailResponse;
+import com.example.test_project.dto.request.*;
+import com.example.test_project.dto.response.*;
 import com.example.test_project.service.UserService;
 import com.example.test_project.util.AuthUtil;
 import com.example.test_project.util.RateLimitUtil;
