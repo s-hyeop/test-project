@@ -96,7 +96,7 @@ public class TodosRepository {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
-        
+
         return dslContext.selectCount()
                 .from(TODOS)
                 .where(TODOS.USER_NO.eq(userNo))
@@ -138,7 +138,7 @@ public class TodosRepository {
                 .set(TODOS.SEQUENCE, sequence)
                 .set(TODOS.DUE_AT, todoPojo.getDueAt())
                 .set(TODOS.CREATED_AT, todoPojo.getCreatedAt())
-                .returning(TODOS.TODO_ID) 
+                .returning(TODOS.TODO_ID)
                 .fetchOne()
                 .getTodoId();
     }
@@ -261,7 +261,8 @@ public class TodosRepository {
                 .from(TODOS)
                 .where(TODOS.USER_NO.eq(userNo))
                 .fetchOneInto(Integer.class);
-        
+
         return maxSequence != null ? maxSequence + 1 : 1;
     }
+
 }

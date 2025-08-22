@@ -76,7 +76,7 @@ public class TokensRepository {
                 .set(TOKENS.ACCESS_TOKEN_EXPIRES_AT, tokenPojo.getAccessTokenExpiresAt())
                 .set(TOKENS.REFRESH_TOKEN_EXPIRES_AT, tokenPojo.getRefreshTokenExpiresAt())
                 .set(TOKENS.CREATED_AT, tokenPojo.getCreatedAt())
-                .returning(TOKENS.TOKEN_NO) 
+                .returning(TOKENS.TOKEN_NO)
                 .fetchOne()
                 .getTokenNo();
     }
@@ -152,4 +152,5 @@ public class TokensRepository {
                 .where(TOKENS.REFRESH_TOKEN.eq(refreshToken))
                 .execute();
     }
+
 }

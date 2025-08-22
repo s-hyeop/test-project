@@ -69,7 +69,7 @@ public class UsersRepository {
                 .set(USERS.USER_NAME, userPojo.getUserName())
                 .set(USERS.ROLE, userPojo.getRole())
                 .set(USERS.CREATED_AT, userPojo.getCreatedAt())
-                .returning(USERS.USER_NO) 
+                .returning(USERS.USER_NO)
                 .fetchOne()
                 .getUserNo();
     }
