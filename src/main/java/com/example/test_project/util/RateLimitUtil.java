@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
 /**
  * API 요청 속도 제한 유틸리티 클래스
  * 
@@ -50,12 +51,12 @@ public class RateLimitUtil {
         if (request == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
-        
+
         String clientIp = resolveClientIp(request);
         String rateLimitKey = RATE_LIMIT_KEY_PREFIX + clientIp;
 
         Long requestCount = incrementRequestCount(rateLimitKey);
-        
+
         if (requestCount == 1L) {
             setExpirationTime(rateLimitKey);
         }
@@ -66,13 +67,15 @@ public class RateLimitUtil {
         }
     }
 
+
     /**
      * 요청 카운트를 증가시킵니다.
      */
     private Long incrementRequestCount(String key) {
         return redisTemplate.opsForValue().increment(key);
     }
-    
+
+
     /**
      * 키의 만료 시간을 설정합니다.
      */
@@ -80,6 +83,7 @@ public class RateLimitUtil {
         Duration window = Duration.ofSeconds(appProperties.getRedisRatelimitWindowSeconds());
         redisTemplate.expire(key, window);
     }
+
 
     /**
      * HTTP 요청에서 실제 클라이언트 IP를 추출합니다.
@@ -99,15 +103,17 @@ public class RateLimitUtil {
                 return ip.contains(",") ? ip.split(",")[0].trim() : ip.trim();
             }
         }
-        
+
         // 헤더에서 찾지 못한 경우 기본 remote address 사용
         return request.getRemoteAddr();
     }
-    
+
+
     /**
      * IP 주소 유효성을 검사합니다.
      */
     private boolean isValidIp(String ip) {
         return ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip);
     }
+
 }

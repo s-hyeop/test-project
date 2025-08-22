@@ -9,16 +9,16 @@ import com.fasterxml.uuid.impl.TimeBasedEpochRandomGenerator;
  * <p>시간 기반 정렬 가능한 UUID v7을 생성하는 기능을 제공합니다.</p>
  */
 public final class UuidUtil {
-    
-    private static final TimeBasedEpochRandomGenerator UUID_V7_GENERATOR = 
-        Generators.timeBasedEpochRandomGenerator();
-    
+
+    private static final TimeBasedEpochRandomGenerator UUID_V7_GENERATOR = Generators.timeBasedEpochRandomGenerator();
+
     /**
      * 유틸리티 클래스의 인스턴스화 방지
      */
     private UuidUtil() {
         throw new AssertionError("Utility class should not be instantiated");
     }
+
 
     /**
      * UUID v7을 생성합니다.
@@ -39,7 +39,8 @@ public final class UuidUtil {
     public static String generateUuidV7() {
         return UUID_V7_GENERATOR.generate().toString();
     }
-    
+
+
     /**
      * UUID v7을 생성하여 하이픈을 제거한 형태로 반환합니다.
      * 
@@ -48,4 +49,5 @@ public final class UuidUtil {
     public static String generateUuidV7WithoutHyphens() {
         return UUID_V7_GENERATOR.generate().toString().replace("-", "");
     }
+
 }

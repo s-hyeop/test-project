@@ -27,7 +27,7 @@ public class RedisUtil {
     private static final String RESET_KEY_PREFIX = "resetPassword:";
 
     // ==================== 회원가입 관련 메서드 ====================
-    
+
     /**
      * 회원가입 인증 키를 Redis에 저장합니다.
      * 
@@ -38,14 +38,14 @@ public class RedisUtil {
     public void saveSignupKey(String email, String value) {
         validateParameters(email, value);
         String key = SIGNUP_KEY_PREFIX + email;
-        
+
         redisTemplate.opsForValue().set(
-            key, 
-            value, 
-            appProperties.getRedisTtlSignup(), 
+            key,
+            value,
+            appProperties.getRedisTtlSignup(),
             TimeUnit.SECONDS
         );
-        
+
         log.debug("Signup key saved for email: {}", email);
     }
 
@@ -74,8 +74,10 @@ public class RedisUtil {
         log.debug("Signup key deleted for email: {}", email);
     }
 
+
+
     // ==================== 비밀번호 재설정 관련 메서드 ====================
-    
+
     /**
      * 비밀번호 재설정 키를 Redis에 저장합니다.
      * 
@@ -86,14 +88,14 @@ public class RedisUtil {
     public void saveResetPasswordKey(String email, String value) {
         validateParameters(email, value);
         String key = RESET_KEY_PREFIX + email;
-        
+
         redisTemplate.opsForValue().set(
-            key, 
-            value, 
-            appProperties.getRedisTtlResetPassword(), 
+            key,
+            value,
+            appProperties.getRedisTtlResetPassword(),
             TimeUnit.SECONDS
         );
-        
+
         log.debug("Reset password key saved for email: {}", email);
     }
 
@@ -122,8 +124,10 @@ public class RedisUtil {
         log.debug("Reset password key deleted for email: {}", email);
     }
 
+
+
     // ==================== 공통 메서드 ====================
-    
+
     /**
      * 키의 남은 TTL(Time To Live)을 조회합니다.
      * 
@@ -133,28 +137,27 @@ public class RedisUtil {
      */
     public long getTimeToLive(String email, String keyType) {
         validateEmail(email);
-        
-        String prefix = "signup".equalsIgnoreCase(keyType) ? 
-            SIGNUP_KEY_PREFIX : RESET_KEY_PREFIX;
-        
+
+        String prefix = "signup".equalsIgnoreCase(keyType) ? SIGNUP_KEY_PREFIX : RESET_KEY_PREFIX;
+
         Long ttl = redisTemplate.getExpire(prefix + email, TimeUnit.SECONDS);
         return ttl != null ? ttl : -1;
     }
-    
+
     /**
      * Redis에서 키 값을 검증합니다.
      */
     private boolean verifyKey(String key, String value) {
         String storedValue = redisTemplate.opsForValue().get(key);
         boolean isValid = storedValue != null && storedValue.equals(value);
-        
+
         if (!isValid) {
             log.debug("Key verification failed for: {}", key);
         }
-        
+
         return isValid;
     }
-    
+
     /**
      * Redis에서 키를 삭제합니다.
      */
@@ -164,7 +167,7 @@ public class RedisUtil {
             log.debug("Key deleted: {}", key);
         }
     }
-    
+
     /**
      * 이메일과 값 매개변수를 검증합니다.
      */
@@ -174,7 +177,7 @@ public class RedisUtil {
             throw new IllegalArgumentException("Value cannot be null or empty");
         }
     }
-    
+
     /**
      * 이메일 매개변수를 검증합니다.
      */
@@ -183,4 +186,5 @@ public class RedisUtil {
             throw new IllegalArgumentException("Email cannot be null or empty");
         }
     }
+
 }

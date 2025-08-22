@@ -8,11 +8,11 @@
 ## 관리 파일
 
 ### 무시되는 실제 파일
-- `/gradle.properties`  
+- `/gradle.properties`
 - `/src/main/resources/application.properties`
 
 ### 제공되는 예제 파일
-- `/gradle.properties.example`  
+- `/gradle.properties.example`
 - `/src/main/resources/application.properties.example`
 
 ---

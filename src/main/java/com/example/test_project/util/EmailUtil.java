@@ -10,6 +10,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
 /**
  * 이메일 발송 유틸리티 클래스
  * 
@@ -39,7 +40,7 @@ public class EmailUtil {
      */
     public void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
         validateEmailParameters(to, subject, htmlContent);
-        
+
         try {
             MimeMessage mimeMessage = createMimeMessage(to, subject, htmlContent);
             mailSender.send(mimeMessage);
@@ -49,23 +50,22 @@ public class EmailUtil {
             throw e;
         }
     }
-    
+
     /**
      * MimeMessage 객체를 생성합니다.
      */
-    private MimeMessage createMimeMessage(String to, String subject, String htmlContent) 
-            throws MessagingException {
+    private MimeMessage createMimeMessage(String to, String subject, String htmlContent) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-        
+
         helper.setFrom(fromAddress);
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
-        
+
         return mimeMessage;
     }
-    
+
     /**
      * 이메일 발송 매개변수를 검증합니다.
      */
@@ -80,4 +80,5 @@ public class EmailUtil {
             throw new IllegalArgumentException("Email content cannot be null or empty");
         }
     }
+
 }
