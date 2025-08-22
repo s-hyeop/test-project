@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.test_project.config.properties.AppRroperties;
+import com.example.test_project.config.properties.AppProperties;
 import com.example.test_project.dto.request.*;
 import com.example.test_project.dto.response.*;
 import com.example.test_project.service.AuthService;
@@ -30,7 +30,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RateLimitUtil rateLimitUtil;
-    private final AppRroperties appProperties;
+    private final AppProperties appProperties;
 
 
     @PostMapping("/email/exist")

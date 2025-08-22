@@ -10,7 +10,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
-import com.example.test_project.config.properties.AppRroperties;
+import com.example.test_project.config.properties.AppProperties;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtTokenProvider implements InitializingBean {
 
-    private final AppRroperties appProperties;
+    private final AppProperties appProperties;
 
     private SecretKey secretKey;
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.test_project.config.exception.BadRequestException;
-import com.example.test_project.config.properties.AppRroperties;
+import com.example.test_project.config.properties.AppProperties;
 import com.example.test_project.dto.response.*;
 import com.example.test_project.service.AuthService;
 import com.example.test_project.util.*;
@@ -31,7 +31,7 @@ public class TokenController {
     private final AuthService authService;
     private final RateLimitUtil rateLimitUtil;
 
-    private final AppRroperties appProperties;
+    private final AppProperties appProperties;
 
     @GetMapping("")
     @PreAuthorize("hasRole('USER')")

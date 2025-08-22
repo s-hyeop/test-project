@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "app")
-public class AppRroperties {
+public class AppProperties {
 
     // 비밀키
     private String jwtSecret;

@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.example.test_project.config.properties.AppRroperties;
+import com.example.test_project.config.properties.AppProperties;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class RedisUtil {
 
     private final StringRedisTemplate redisTemplate;
-    private final AppRroperties appProperties;
+    private final AppProperties appProperties;
 
     private static final String SIGNUP_PREFIX = "signup:";
     private static final String RESET_PREFIX  = "resetPassword:";

@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.jooq.tables.pojos.Tokens;
 import com.example.jooq.tables.pojos.Users;
 import com.example.test_project.config.exception.*;
-import com.example.test_project.config.properties.AppRroperties;
+import com.example.test_project.config.properties.AppProperties;
 import com.example.test_project.config.security.CustomUserDetails;
 import com.example.test_project.config.security.provider.JwtTokenProvider;
 import com.example.test_project.dto.request.*;
@@ -40,7 +40,7 @@ public class AuthService {
     private final EmailUtil emailUtil;
     private final RedisUtil redisUtil;
 
-    private final AppRroperties appProperties;
+    private final AppProperties appProperties;
 
     @Transactional(readOnly = true)
     public EmailExistResponse existsByEmail(EmailRequest emailRequest) {
