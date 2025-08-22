@@ -16,11 +16,24 @@ spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 logging.level.org.jooq.tools.LoggerListener=INFO
 
+# 비밀키
 jwt.secret={secret-key}
+
+# AT 만료(분)
 jwt.access-expiration-minutes={access-expiration-minutes}
+
+# RT 만료(분, 30일)
 jwt.refresh-expiration-minutes={refresh-expiration-minutes}
+
+# 쿠키이름
 jwt.refresh-token-cookie-name={refresh-token-cookie-name}
 
+# redis 회원가입 인증 코드 TTL, 5분
+redis.ttl.signup=300
 
-redis.ttl.signup=300 # 5분
-redis.ttl.reset-password=600 # 10분
+# redis 비밀번호 찾기 인증 코드 TTL, 5분
+redis.ttl.reset-password=600
+
+# 10초 동안 5회 허용
+ratelimit.max-requests=5
+ratelimit.window-seconds=10
