@@ -70,5 +70,4 @@ public class JwtTokenProvider implements InitializingBean {
                 .getPayload().get("role");
         return v == null ? null : String.valueOf(v);
     }
-
 }
