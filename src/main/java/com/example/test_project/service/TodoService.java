@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.jooq.tables.pojos.Todos;
 import com.example.test_project.config.exception.*;
@@ -21,6 +22,7 @@ public class TodoService {
     private final TodosRepository todosRepository;
 
 
+    @Transactional(readOnly = true)
     public TodoListResponse getTodos(int userNo, TodoListRequest todoListRequest) {
         List<Todos> todosPojo = todosRepository.findPageByUserNo(userNo, todoListRequest.getPage()-1, todoListRequest.getSize());
         List<TodoDetailResponse> dtoList = todosPojo.stream()
@@ -47,6 +49,7 @@ public class TodoService {
             .build();
     }
 
+    @Transactional(readOnly = true)
     public TodoDetailResponse getTodo(int userNo, String todoId) {
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
             new NotFoundException("TODO를 찾을 수 없습니다.")
@@ -69,6 +72,7 @@ public class TodoService {
             .build();
     }
 
+    @Transactional
     public TodoCreateResponse createTodo(int userNo, TodoCreateRequest todoCreateRequest) {
         Todos todoPojo = new Todos();
         String todoId = UuidUtil.generateUuidV7(); // UUID v7
@@ -90,6 +94,7 @@ public class TodoService {
             .build();
     }
 
+    @Transactional
     public void updateTodo(int userNo, String todoId, TodoUpdateRequest todoUpdateRequest) {
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
             new NotFoundException("TODO를 찾을 수 없습니다.")
@@ -111,6 +116,7 @@ public class TodoService {
         }
     }
 
+    @Transactional
     public void patchTodo(int userNo, String todoId, TodoPatchRequest todoPatchRequest) {
         int reslutCount = 0;
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
@@ -138,6 +144,7 @@ public class TodoService {
         }
     }
 
+    @Transactional
     public void deleteTodo(int userNo, String todoId) {
         Todos todoPojo = todosRepository.find(todoId).orElseThrow(() ->
             new NotFoundException("TODO를 찾을 수 없습니다.")
@@ -152,6 +159,7 @@ public class TodoService {
         }
     }
 
+    @Transactional(readOnly = true)
     public TodoStatisticsResponse getTodoStatistics(int userNo) {
         int totalCount = todosRepository.countByUserNo(userNo);
         int completedCount = todosRepository.countCompletedByUserNo(userNo);

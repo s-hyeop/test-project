@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.jooq.tables.pojos.Tokens;
 import com.example.jooq.tables.pojos.Users;
@@ -38,12 +39,16 @@ public class AuthService {
     private final EmailUtil emailUtil;
     private final RedisUtil redisUtil;
 
+    @Value("${jwt.access-token-reissue-threshold-minutes}")
+    private int accessTokenReissueThresholdMinutes;
+
     @Value("${jwt.access-expiration-minutes}")
     private int accessExpirationMinutes;
 
     @Value("${jwt.refresh-expiration-minutes}")
     private int refreshExpirationMinutes;
 
+    @Transactional(readOnly = true)
     public EmailExistResponse existsByEmail(EmailRequest emailRequest) {
         // 계정이 없으면 true, 계정이 있으면 false
         boolean result = usersRepository.findByEmail(emailRequest.getEmail()).isPresent();
@@ -53,6 +58,7 @@ public class AuthService {
             .build();
     }
 
+    @Transactional
     public AccessTokenResponse login(LoginRequest loginRequest, String ClientOs) {
         try {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
@@ -83,6 +89,7 @@ public class AuthService {
         }
     }
 
+    @Transactional(readOnly = true)
     public void sendSignupCode(SignupCodeSendRequest signupCodeSendRequest) {
         // 계정이 존재하지 않는지 확인
         if (!usersRepository.findByEmail(signupCodeSendRequest.getEmail()).isEmpty()) {
@@ -103,6 +110,7 @@ public class AuthService {
         redisUtil.saveSignupKey(signupCodeSendRequest.getEmail(), code);
     }
 
+    @Transactional(readOnly = true)
     public void verifySignupCode(SignupCodeVerifyRequest signupCodeVerifyRequest) {
         // redis 이메일 인증 코드 검증
         if (!redisUtil.verifySignupKey(signupCodeVerifyRequest.getEmail(), signupCodeVerifyRequest.getCode())) {
@@ -110,6 +118,7 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public void signup(SignupRequest signupRequest) {
         // 계정이 존재하지 않는지 확인
         if (!usersRepository.findByEmail(signupRequest.getEmail()).isEmpty()) {
@@ -140,6 +149,7 @@ public class AuthService {
         }
     }
 
+    @Transactional(readOnly = true)
     public void sendResetPasswordCode(ResetPasswordCodeSendRequest resetPasswordCodeSendRequest) {
         // 계정이 존재하는지 확인
         usersRepository.findByEmail(resetPasswordCodeSendRequest.getEmail()).orElseThrow(() ->
@@ -160,6 +170,7 @@ public class AuthService {
         redisUtil.saveResetPasswordKey(resetPasswordCodeSendRequest.getEmail(), code);
     }
 
+    @Transactional(readOnly = true)
     public void verifyResetPasswordCode(ResetPasswordCodeVerifyRequest resetPasswordCodeVerifyRequest) {
         // redis 이메일 인증 코드 검증
         if (!redisUtil.verifyResetPasswordKey(resetPasswordCodeVerifyRequest.getEmail(), resetPasswordCodeVerifyRequest.getCode())) {
@@ -167,6 +178,7 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
         // 계정이 존재하는지 확인
         Users userPojo = usersRepository.findByEmail(resetPasswordRequest.getEmail()).orElseThrow(() ->
@@ -194,6 +206,7 @@ public class AuthService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<RefreshTokenDetailResponse> getTokens(int userNo) {
         List<Tokens> tokensPojo = tokensRepository.findAllActiveTokensByUserNo(userNo);
         return tokensPojo.stream()
@@ -205,9 +218,10 @@ public class AuthService {
             ).toList();
     }
 
+    @Transactional
     public AccessTokenResponse refreshAccessToken(String refreshToken) {
         Tokens tokenPojo = tokensRepository.findByRefreshToken(refreshToken).orElseThrow(() -> 
-            new NotFoundException("로그인 토큰이 만료되었습니다.")
+            new NotFoundException("유효하지 않은 토큰입니다.")
         );
 
         Users userPojo = usersRepository.find(tokenPojo.getUserNo()).orElseThrow(() -> 
@@ -215,10 +229,8 @@ public class AuthService {
         );
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime accessExpiresAt = tokenPojo.getAccessTokenExpiresAt();
-        LocalDateTime accessAvailableAt = accessExpiresAt.minusMinutes(3);
 
-        if (now.isBefore(accessAvailableAt)) {
+        if (now.isBefore(tokenPojo.getAccessTokenExpiresAt().minusMinutes(accessTokenReissueThresholdMinutes))) {
             throw new ConflictException("아직 갱신할 수 없습니다.");
         }
 
@@ -240,6 +252,7 @@ public class AuthService {
             .build();
     }
 
+    @Transactional
     public void deleteToken(int userNo, String refreshToken) {
         Tokens tokenPojo = tokensRepository.findByRefreshToken(refreshToken).orElseThrow(() -> 
             new NotFoundException("토큰을 찾을 수 없습니다.")

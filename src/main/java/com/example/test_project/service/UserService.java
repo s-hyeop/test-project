@@ -2,6 +2,7 @@ package com.example.test_project.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.jooq.tables.pojos.Users;
 import com.example.test_project.config.exception.*;
@@ -18,6 +19,7 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
     public UserDetailResponse getUserDetail(int userNo) {
         Users userPojo = usersRepository.find(userNo).orElseThrow(() ->
             new NotFoundException("회원을 찾을 수 없습니다.")
@@ -30,6 +32,7 @@ public class UserService {
             .build();
     }
 
+    @Transactional
     public void updateUser(int userNo, UserPatchRequest userPatchRequest) {
         usersRepository.find(userNo).orElseThrow(() ->
             new NotFoundException("회원을 찾을 수 없습니다.")
@@ -43,6 +46,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void changePassword(int userNo, UserChangePasswordRequest userChangePasswordRequest) {
         Users userPojo = usersRepository.find(userNo).orElseThrow(() ->
             new NotFoundException("회원을 찾을 수 없습니다.")
