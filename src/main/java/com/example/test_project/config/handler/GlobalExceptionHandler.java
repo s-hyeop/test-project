@@ -1,4 +1,4 @@
-package com.example.test_project.config.exception;
+package com.example.test_project.config.handler;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.example.test_project.config.exception.*;
 import com.example.test_project.dto.response.ErrorResponse;
 
 import io.jsonwebtoken.JwtException;
@@ -46,7 +48,7 @@ public class GlobalExceptionHandler {
 
     // 401 Unauthorized
     @ExceptionHandler({UnauthorizedException.class, AuthenticationException.class, JwtException.class})
-    public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException e, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleUnauthorized(RuntimeException e, WebRequest request) {
         log.debug("UnauthorizedException: {}", e.getMessage());
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
@@ -60,7 +62,7 @@ public class GlobalExceptionHandler {
     }
 
     // 403 Forbidden
-    @ExceptionHandler({ForbiddenException.class})
+    @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException e, WebRequest request) {
         log.debug("ForbiddenException: {}", e.getMessage());
         return ResponseEntity
@@ -75,7 +77,7 @@ public class GlobalExceptionHandler {
     }
 
     // AuthorizationDeniedException
-    @ExceptionHandler({AuthorizationDeniedException.class})
+    @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(AuthorizationDeniedException e, WebRequest request) {
         log.debug("AuthorizationDeniedException: {}", e.getMessage());
         return ResponseEntity
@@ -89,11 +91,25 @@ public class GlobalExceptionHandler {
                 .build());
     }
 
-
     // 404 Not Found
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException e, WebRequest request) {
         log.debug("NotFoundException: {}", e.getMessage());
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .message(e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build());
+    }
+
+    // 404 Not Found
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NoResourceFoundException e, WebRequest request) {
+        log.debug("NoResourceFoundException: {}", e.getMessage());
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse.builder()
@@ -120,7 +136,6 @@ public class GlobalExceptionHandler {
                 .build());
     }
 
-
     // 429 Too Many Request
     @ExceptionHandler(TooManyRequestsException.class)
     public ResponseEntity<ErrorResponse> handleMessageNotReadable(TooManyRequestsException e, WebRequest request) {
@@ -135,7 +150,6 @@ public class GlobalExceptionHandler {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build());
     }
-
 
     // 500 Internal Server Error
     @ExceptionHandler(InternalServerException.class)
