@@ -2,7 +2,6 @@ package com.example.test_project.controller;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.test_project.config.properties.AppRroperties;
 import com.example.test_project.dto.request.*;
 import com.example.test_project.dto.response.*;
 import com.example.test_project.service.AuthService;
@@ -34,16 +34,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RateLimitUtil rateLimitUtil;
-
-    @Value("${jwt.refresh-token-cookie-name:refreshToken}")
-    private String rtCookieName;
-
-    @Value("${jwt.access-expiration-minutes}")
-    private int accessExpirationMinutes;
-
-    @Value("${jwt.refresh-expiration-minutes}")
-    private int refreshExpirationMinutes;
-
+    private final AppRroperties appProperties;
 
 
     @PostMapping("/email/exist")
@@ -140,12 +131,12 @@ public class AuthController {
 
 
     private ResponseCookie generateRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from(rtCookieName, refreshToken)
+        return ResponseCookie.from(appProperties.getJwtRefreshTokenCookieName(), refreshToken)
             .httpOnly(true)
             .secure(true)
             .sameSite("None")
             .path("/")
-            .maxAge(Duration.ofMinutes(refreshExpirationMinutes))
+            .maxAge(Duration.ofMinutes(appProperties.getJwtRefreshExpirationMinutes()))
             .build();
     }
 

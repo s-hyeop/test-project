@@ -11,31 +11,28 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.example.test_project.config.properties.AppRroperties;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider implements InitializingBean {
 
-    @Value("${jwt.secret}")
-    private String secret;
-
-    @Value("${jwt.access-expiration-minutes}")
-    private int accessExpireMinutes;
-
-    @Value("${jwt.refresh-expiration-minutes}")
-    private int refreshExpireMinutes;
+    private final AppRroperties appProperties;
 
     private SecretKey secretKey;
 
     @Override
     public void afterPropertiesSet() {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)); 
+        this.secretKey = Keys.hmacShaKeyFor(appProperties.getJwtSecret().getBytes(StandardCharsets.UTF_8)); 
     }
 
     public String generateAccessToken(int userNo, String email, String role) {
@@ -43,7 +40,7 @@ public class JwtTokenProvider implements InitializingBean {
         return Jwts.builder()
                 .subject(email) // (9) sub=email
                 .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plus(accessExpireMinutes, ChronoUnit.MINUTES)))
+                .expiration(Date.from(now.plus(appProperties.getJwtAccessExpirationMinutes(), ChronoUnit.MINUTES)))
                 .claim("userNo", userNo)
                 .claim("role", role)
                 .signWith(secretKey)

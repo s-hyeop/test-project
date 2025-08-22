@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.jooq.tables.pojos.Tokens;
 import com.example.jooq.tables.pojos.Users;
 import com.example.test_project.config.exception.*;
+import com.example.test_project.config.properties.AppRroperties;
 import com.example.test_project.config.security.CustomUserDetails;
 import com.example.test_project.config.security.provider.JwtTokenProvider;
 import com.example.test_project.dto.request.*;
@@ -39,14 +40,7 @@ public class AuthService {
     private final EmailUtil emailUtil;
     private final RedisUtil redisUtil;
 
-    @Value("${jwt.access-token-reissue-threshold-minutes}")
-    private int accessTokenReissueThresholdMinutes;
-
-    @Value("${jwt.access-expiration-minutes}")
-    private int accessExpirationMinutes;
-
-    @Value("${jwt.refresh-expiration-minutes}")
-    private int refreshExpirationMinutes;
+    private final AppRroperties appProperties;
 
     @Transactional(readOnly = true)
     public EmailExistResponse existsByEmail(EmailRequest emailRequest) {
@@ -72,8 +66,8 @@ public class AuthService {
             tokenPojo.setUserNo(customUserDetails.getUserNo());
             tokenPojo.setRefreshToken(refreshToken);
             tokenPojo.setClientOs(ClientOs);
-            tokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(accessExpirationMinutes, ChronoUnit.MINUTES));
-            tokenPojo.setRefreshTokenExpiresAt(LocalDateTime.now().plus(refreshExpirationMinutes, ChronoUnit.MINUTES));
+            tokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(appProperties.getJwtAccessExpirationMinutes(), ChronoUnit.MINUTES));
+            tokenPojo.setRefreshTokenExpiresAt(LocalDateTime.now().plus(appProperties.getJwtRefreshExpirationMinutes(), ChronoUnit.MINUTES));
             tokenPojo.setCreatedAt(LocalDateTime.now());
 
             if (tokensRepository.save(tokenPojo) == null) {
@@ -230,7 +224,7 @@ public class AuthService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        if (now.isBefore(tokenPojo.getAccessTokenExpiresAt().minusMinutes(accessTokenReissueThresholdMinutes))) {
+        if (now.isBefore(tokenPojo.getAccessTokenExpiresAt().minusMinutes(appProperties.getJwtAccessTokenReissueThresholdMinutes()))) {
             throw new ConflictException("아직 갱신할 수 없습니다.");
         }
 
@@ -239,7 +233,7 @@ public class AuthService {
         }
 
         Tokens updateTokenPojo = new Tokens();
-        updateTokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(accessExpirationMinutes, ChronoUnit.MINUTES));
+        updateTokenPojo.setAccessTokenExpiresAt(LocalDateTime.now().plus(appProperties.getJwtAccessExpirationMinutes(), ChronoUnit.MINUTES));
 
         if (tokensRepository.update(tokenPojo.getTokenNo(), updateTokenPojo) == 0) {
             throw new InternalServerException("토큰 갱신에 실패했습니다.");

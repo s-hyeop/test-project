@@ -2,29 +2,26 @@ package com.example.test_project.util;
 
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+
+import com.example.test_project.config.properties.AppRroperties;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class RedisUtil {
+
     private final StringRedisTemplate redisTemplate;
-
-    @Value("${redis.ttl.signup}")
-    private long signupTtl;
-
-    @Value("${redis.ttl.reset-password}")
-    private long resetPasswordTtl;
+    private final AppRroperties appProperties;
 
     private static final String SIGNUP_PREFIX = "signup:";
     private static final String RESET_PREFIX  = "resetPassword:";
 
     // ---------------------- SIGNUP ----------------------
     public void saveSignupKey(String email, String value) {
-        redisTemplate.opsForValue().set(SIGNUP_PREFIX + email, value, signupTtl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(SIGNUP_PREFIX + email, value, appProperties.getRedisTtlSignup(), TimeUnit.SECONDS);
     }
 
     public boolean verifySignupKey(String email, String value) {
@@ -38,7 +35,7 @@ public class RedisUtil {
 
     // ---------------------- RESET PASSWORD ----------------------
     public void saveResetPasswordKey(String email, String value) {
-        redisTemplate.opsForValue().set(RESET_PREFIX + email, value, resetPasswordTtl, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(RESET_PREFIX + email, value, appProperties.getRedisTtlResetPassword(), TimeUnit.SECONDS);
     }
 
     public boolean verifyResetPasswordKey(String email, String value) {

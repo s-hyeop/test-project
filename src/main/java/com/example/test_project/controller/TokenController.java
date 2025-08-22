@@ -2,7 +2,6 @@ package com.example.test_project.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.test_project.config.exception.BadRequestException;
+import com.example.test_project.config.properties.AppRroperties;
 import com.example.test_project.dto.response.*;
 import com.example.test_project.service.AuthService;
 import com.example.test_project.util.*;
@@ -34,10 +34,7 @@ public class TokenController {
     private final AuthService authService;
     private final RateLimitUtil rateLimitUtil;
 
-    @Value("${jwt.refresh-token-cookie-name:refreshToken}")
-    private String rtCookieName;
-
-
+    private final AppRroperties appProperties;
 
     @GetMapping("")
     @PreAuthorize("hasRole('USER')")
@@ -53,7 +50,7 @@ public class TokenController {
 
     @PostMapping("/refresh")
     @Operation(summary = "AccessToken 재발급", description = "RefreshToken을 사용하여 새로운 AccessToken을 발급받습니다.")
-    public ResponseEntity<AccessTokenResponse> refreshAccessToken(@CookieValue(name = "${jwt.refresh-token-cookie-name}", required = false) String refreshToken, HttpServletRequest request) {
+    public ResponseEntity<AccessTokenResponse> refreshAccessToken(@CookieValue(name = "${app.jwt-refresh-token-cookie-name}", required = false) String refreshToken, HttpServletRequest request) {
         rateLimitUtil.checkRateLimit(request);
 
 
@@ -83,7 +80,7 @@ public class TokenController {
     @DeleteMapping("/current")
     @PreAuthorize("hasRole('USER')")
     @Operation(summary = "현재 RefreshToken 삭제", description = "현재 로그인 세션에서 사용 중인 RefreshToken을 삭제합니다.")
-    public ResponseEntity<Void> deleteCurrentToken(@CookieValue("${jwt.refresh-token-cookie-name}") String refreshToken) {
+    public ResponseEntity<Void> deleteCurrentToken(@CookieValue("${app.jwt-refresh-token-cookie-name}") String refreshToken) {
         Integer userNo = AuthUtil.currentUserNo();
         
         authService.deleteToken(userNo, refreshToken);
@@ -93,7 +90,7 @@ public class TokenController {
     }
 
     private ResponseCookie removeRefreshTokenCookie() {
-        return ResponseCookie.from(rtCookieName, "")
+        return ResponseCookie.from(appProperties.getJwtRefreshTokenCookieName(), "")
             .httpOnly(true)
             .secure(true)
             .sameSite("None")
