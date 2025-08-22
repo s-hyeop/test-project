@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TodoStatisticsResponse {
 
-    // 전체 TODO 개수
+    // 전체 TO-DO 개수
     private int totalCount;
 
-    // 완료된 TODO 개수
+    // 완료된 TO-DO 개수
     private int completedCount;
 
-    // 오늘 완료된 TODO 개수
+    // 오늘 완료된 TO-DO 개수
     private int todayCompletedCount;
 
 }

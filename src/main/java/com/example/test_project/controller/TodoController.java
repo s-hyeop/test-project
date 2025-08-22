@@ -26,9 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 
 
 /**
- * TODO 관련 REST API 컨트롤러
+ * TO-DO 관련 REST API 컨트롤러
  * 
- * <>사용자의 TODO 항목을 관리하는 엔드포인트를 제공합니다.
+ * <>사용자의 TO-DO 항목을 관리하는 엔드포인트를 제공합니다.
  * 모든 엔드포인트는 USER 권한이 필요합니다.</p>
  */
 @Slf4j
@@ -42,10 +42,10 @@ public class TodoController {
     private final RateLimitUtil rateLimitUtil;
 
     /**
-     * TODO 목록을 페이징하여 조회합니다.
+     * TO-DO 목록을 페이징하여 조회합니다.
      * 
      * @param todoListRequest 페이징 요청 정보 (page, size)
-     * @return TODO 목록과 페이징 정보를 포함한 응답
+     * @return TO-DO 목록과 페이징 정보를 포함한 응답
      */
     @GetMapping("")
     public ResponseEntity<TodoListResponse> getTodos(@Valid @ModelAttribute TodoListRequest todoListRequest) {
@@ -54,20 +54,20 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 목록 조회 요청 - userNo: {}, page: {}, size: {}", userNo, todoListRequest.getPage(), todoListRequest.getSize());
+        log.info("TO-DO 목록 조회 요청 - userNo: {}, page: {}, size: {}", userNo, todoListRequest.getPage(), todoListRequest.getSize());
 
         TodoListResponse todoListResponse = todoService.getTodos(userNo, todoListRequest);
-        log.debug("TODO 목록 조회 완료 - userNo: {}, 조회된 항목 수: {}", userNo, todoListResponse.getList().size());
+        log.debug("TO-DO 목록 조회 완료 - userNo: {}, 조회된 항목 수: {}", userNo, todoListResponse.getList().size());
 
         return ResponseEntity.ok().body(todoListResponse);
     }
 
 
     /**
-     * 특정 TODO 항목의 상세 정보를 조회합니다.
+     * 특정 TO-DO 항목의 상세 정보를 조회합니다.
      * 
      * @param todoId 조회할 TODO의 ID
-     * @return TODO 상세 정보
+     * @return TO-DO 상세 정보
      */
     @GetMapping("/{todoId}")
     public ResponseEntity<TodoDetailResponse> getTodo(@PathVariable String todoId) {
@@ -76,20 +76,20 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 상세 조회 요청 - userNo: {}, todoId: {}", userNo, todoId);
+        log.info("TO-DO 상세 조회 요청 - userNo: {}, todoId: {}", userNo, todoId);
         TodoDetailResponse todoDetailResponse = todoService.getTodo(userNo, todoId);
-        log.debug("TODO 상세 조회 완료 - userNo: {}, todoId: {}", userNo, todoId);
+        log.debug("TO-DO 상세 조회 완료 - userNo: {}, todoId: {}", userNo, todoId);
 
         return ResponseEntity.ok().body(todoDetailResponse);
     }
 
 
     /**
-     * 새로운 TODO 항목을 생성합니다.
+     * 새로운 TO-DO 항목을 생성합니다.
      * 
      * <p>Rate limiting이 적용되어 있어 과도한 요청이 제한됩니다.</p>
      * 
-     * @param todoCreateRequest TODO 생성 요청 정보
+     * @param todoCreateRequest TO-DO 생성 요청 정보
      * @param request HTTP 요청 객체 (rate limiting용)
      * @return 생성된 TODO의 ID를 포함한 응답
      */
@@ -101,21 +101,21 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 생성 요청 - userNo: {}, title: {}", userNo, todoCreateRequest.getTitle());
+        log.info("TO-DO 생성 요청 - userNo: {}, title: {}", userNo, todoCreateRequest.getTitle());
         TodoCreateResponse todoCreateResponse = todoService.createTodo(userNo, todoCreateRequest);
-        log.info("TODO 생성 완료 - userNo: {}, todoId: {}", userNo, todoCreateResponse.getTodoId());
+        log.info("TO-DO 생성 완료 - userNo: {}, todoId: {}", userNo, todoCreateResponse.getTodoId());
 
         return ResponseEntity.ok().body(todoCreateResponse);
     }
 
 
     /**
-     * TODO 항목을 전체 수정합니다.
+     * TO-DO 항목을 전체 수정합니다.
      * 
      * <p>모든 필드를 포함한 전체 업데이트를 수행합니다.</p>
      * 
      * @param todoId 수정할 TODO의 ID
-     * @param todoUpdateRequest TODO 수정 요청 정보
+     * @param todoUpdateRequest TO-DO 수정 요청 정보
      * @return 204 No Content
      */
     @PutMapping("/{todoId}")
@@ -125,16 +125,16 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 수정 요청 - userNo: {}, todoId: {}", userNo, todoId);
+        log.info("TO-DO 수정 요청 - userNo: {}, todoId: {}", userNo, todoId);
         todoService.updateTodo(userNo, todoId, todoUpdateRequest);
-        log.info("TODO 수정 완료 - userNo: {}, todoId: {}", userNo, todoId);
+        log.info("TO-DO 수정 완료 - userNo: {}, todoId: {}", userNo, todoId);
 
         return ResponseEntity.noContent().build();
     }
 
 
     /**
-     * TODO 항목을 부분 수정합니다.
+     * TO-DO 항목을 부분 수정합니다.
      * 
      * <p>완료 상태나 순서 등 특정 필드만 수정할 때 사용합니다.</p>
      * 
@@ -149,16 +149,16 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 부분 수정 요청 - userNo: {}, todoId: {}, sequence: {}, completed: {}", userNo, todoId, todoPatchRequest.getSequence(), todoPatchRequest.getCompleted());
+        log.info("TO-DO 부분 수정 요청 - userNo: {}, todoId: {}, sequence: {}, completed: {}", userNo, todoId, todoPatchRequest.getSequence(), todoPatchRequest.getCompleted());
         todoService.patchTodo(userNo, todoId, todoPatchRequest);
-        log.info("TODO 부분 수정 완료 - userNo: {}, todoId: {}", userNo, todoId);
+        log.info("TO-DO 부분 수정 완료 - userNo: {}, todoId: {}", userNo, todoId);
 
         return ResponseEntity.noContent().build();
     }
 
 
     /**
-     * TODO 항목을 삭제합니다.
+     * TO-DO 항목을 삭제합니다.
      * 
      * @param todoId 삭제할 TODO의 ID
      * @return 204 No Content
@@ -170,20 +170,20 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 삭제 요청 - userNo: {}, todoId: {}", userNo, todoId);
+        log.info("TO-DO 삭제 요청 - userNo: {}, todoId: {}", userNo, todoId);
         todoService.deleteTodo(userNo, todoId);
-        log.info("TODO 삭제 완료 - userNo: {}, todoId: {}", userNo, todoId);
+        log.info("TO-DO 삭제 완료 - userNo: {}, todoId: {}", userNo, todoId);
 
         return ResponseEntity.noContent().build();
     }
 
 
     /**
-     * 사용자의 TODO 통계 정보를 조회합니다.
+     * 사용자의 TO-DO 통계 정보를 조회합니다.
      * 
-     * <p>전체 TODO 수, 완료된 TODO 수, 오늘 완료한 TODO 수 등의 통계를 제공합니다.</p>
+     * <p>전체 TO-DO 수, 완료된 TO-DO 수, 오늘 완료한 TO-DO 수 등의 통계를 제공합니다.</p>
      * 
-     * @return TODO 통계 정보
+     * @return TO-DO 통계 정보
      */
     @GetMapping("/statistics")
     public ResponseEntity<TodoStatisticsResponse> getTodoStatistics() {
@@ -192,9 +192,9 @@ public class TodoController {
             throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
         }
 
-        log.info("TODO 통계 조회 요청 - userNo: {}", userNo);
+        log.info("TO-DO 통계 조회 요청 - userNo: {}", userNo);
         TodoStatisticsResponse todoStatisticsResponse = todoService.getTodoStatistics(userNo);
-        log.debug("TODO 통계 조회 완료 - userNo: {}, total: {}, completed: {}, todayCompleted: {}",
+        log.debug("TO-DO 통계 조회 완료 - userNo: {}, total: {}, completed: {}, todayCompleted: {}",
                 userNo, todoStatisticsResponse.getTotalCount(),
                 todoStatisticsResponse.getCompletedCount(),
                 todoStatisticsResponse.getTodayCompletedCount());

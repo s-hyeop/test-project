@@ -2,7 +2,6 @@ buildscript {
 	ext {
 		jooqVersion = '3.19.25'
 	}
-
 }
 
 plugins {

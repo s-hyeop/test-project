@@ -17,13 +17,13 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TodoDetailResponse {
 
-    // TODO ID
+    // TO-DO ID
     private String todoId;
 
-    // TODO 제목
+    // TO-DO 제목
     private String title;
 
-    // TODO 내용
+    // TO-DO 내용
     private String content;
 
     // 색상

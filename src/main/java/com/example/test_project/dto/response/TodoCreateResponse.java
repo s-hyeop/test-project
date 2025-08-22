@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TodoCreateResponse {
 
-    // 생성된 TODO ID
+    // 생성된 TO-DO ID
     private String todoId;
 
 }
