@@ -18,9 +18,6 @@ import com.example.test_project.dto.response.*;
 import com.example.test_project.service.TodoService;
 import com.example.test_project.util.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/todos")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
-@Tag(name = "DOTO API", description = "TODO CRUD 및 통계 API")
 public class TodoController {
 
     private final TodoService todoService;
@@ -38,8 +34,6 @@ public class TodoController {
 
 
     @GetMapping("")
-    @Operation(summary = "TODO 목록 조회", description = "사용자가 등록한 TODO 목록을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 목록 조회됨")
     public ResponseEntity<TodoListResponse> getTodos(@Valid @ModelAttribute TodoListRequest todoListRequest) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -50,8 +44,6 @@ public class TodoController {
 
 
     @GetMapping("/{todoId}")
-    @Operation(summary = "TODO 상세 조회", description = "특정 TODO의 상세 정보를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 상세 조회됨")
     public ResponseEntity<TodoDetailResponse> getTodo(@PathVariable String todoId) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -62,8 +54,6 @@ public class TodoController {
 
 
     @PostMapping("")
-    @Operation(summary = "TODO 등록", description = "새로운 TODO을 등록합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 등록됨")
     public ResponseEntity<TodoCreateResponse> createTodo(@Valid @RequestBody TodoCreateRequest todoCreateRequest, HttpServletRequest request) {
         rateLimitUtil.checkRateLimit(request);
         Integer userNo = AuthUtil.currentUserNo();
@@ -75,8 +65,6 @@ public class TodoController {
 
 
     @PutMapping("/{todoId}")
-    @Operation(summary = "TODO 전체 수정", description = "특정 TODO의 모든 내용을 수정합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 수정됨")
     public ResponseEntity<Void> updateTodo(@PathVariable String todoId, @Valid @RequestBody TodoUpdateRequest todoUpdateRequest) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -87,8 +75,6 @@ public class TodoController {
 
 
     @PatchMapping("/{todoId}")
-    @Operation(summary = "TODO 부분 수정", description = "특정 TODO의 일부 내용을 수정합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 부분 수정됨")
     public ResponseEntity<Void> patchTodo(@PathVariable String todoId, @Valid @RequestBody TodoPatchRequest todoPatchRequest) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -99,8 +85,6 @@ public class TodoController {
 
 
     @DeleteMapping("/{todoId}")
-    @Operation(summary = "TODO 삭제", description = "특정 TODO을 삭제합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 삭제됨")
     public ResponseEntity<Void> deleteTodo(@PathVariable String todoId) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -111,8 +95,6 @@ public class TodoController {
 
 
     @GetMapping("/statistics")
-    @Operation(summary = "TODO 통계 조회", description = "사용자의 TODO 통계를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 통계 조회됨")
     public ResponseEntity<TodoStatisticsResponse> getTodoStatistics() {
         Integer userNo = AuthUtil.currentUserNo();
 

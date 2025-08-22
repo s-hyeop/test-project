@@ -14,9 +14,6 @@ import com.example.test_project.service.UserService;
 import com.example.test_project.util.AuthUtil;
 import com.example.test_project.util.RateLimitUtil;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
-@Tag(name = "사용자 API", description = "사용자 정보 조회 및 수정, 비밀번호 변경 API")
 public class UserController {
 
     private final UserService userService;
@@ -34,8 +30,6 @@ public class UserController {
 
 
     @GetMapping("")
-    @Operation(summary = "사용자 상세 조회", description = "로그인한 사용자의 상세 정보를 조회합니다. JWT 토큰에서 userNo를 추출하여 사용합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 사용자 정보 조회됨")
     public ResponseEntity<UserDetailResponse> getUserDetail() {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -46,7 +40,6 @@ public class UserController {
 
 
     @PatchMapping("")
-    @Operation(summary = "사용자 정보 수정", description = "로그인한 사용자의 정보를 일부 수정합니다.")
     public ResponseEntity<Void> updateUser(@Valid @RequestBody UserPatchRequest userPatchRequest) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -56,7 +49,6 @@ public class UserController {
 
 
     @PatchMapping("/change-password")
-    @Operation(summary = "비밀번호 변경", description = "로그인한 사용자의 비밀번호를 변경합니다. 기존 비밀번호 검증 후 새 비밀번호를 저장합니다.")
     public ResponseEntity<Void> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest, HttpServletRequest request) {
         rateLimitUtil.checkRateLimit(request);
         Integer userNo = AuthUtil.currentUserNo();

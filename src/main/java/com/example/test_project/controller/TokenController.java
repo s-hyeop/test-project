@@ -20,15 +20,12 @@ import com.example.test_project.dto.response.*;
 import com.example.test_project.service.AuthService;
 import com.example.test_project.util.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/tokens")
 @RequiredArgsConstructor
-@Tag(name = "토큰 API", description = "재발급 및 삭제 관련 API")
 public class TokenController {
 
     private final AuthService authService;
@@ -38,7 +35,6 @@ public class TokenController {
 
     @GetMapping("")
     @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "RefreshToken 목록 조회", description = "로그인된 사용자의 RefreshToken 목록을 조회합니다.")
     public ResponseEntity<List<RefreshTokenDetailResponse>> getTokens() {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -49,7 +45,6 @@ public class TokenController {
 
 
     @PostMapping("/refresh")
-    @Operation(summary = "AccessToken 재발급", description = "RefreshToken을 사용하여 새로운 AccessToken을 발급받습니다.")
     public ResponseEntity<AccessTokenResponse> refreshAccessToken(@CookieValue(name = "${app.jwt-refresh-token-cookie-name}", required = false) String refreshToken, HttpServletRequest request) {
         rateLimitUtil.checkRateLimit(request);
 
@@ -67,7 +62,6 @@ public class TokenController {
 
     @DeleteMapping("/{refreshToken}")
     @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "특정 RefreshToken 삭제", description = "사용자가 보유한 특정 RefreshToken을 삭제합니다.")
     public ResponseEntity<Void> deleteToken(@PathVariable String refreshToken) {
         Integer userNo = AuthUtil.currentUserNo();
 
@@ -79,7 +73,6 @@ public class TokenController {
 
     @DeleteMapping("/current")
     @PreAuthorize("hasRole('USER')")
-    @Operation(summary = "현재 RefreshToken 삭제", description = "현재 로그인 세션에서 사용 중인 RefreshToken을 삭제합니다.")
     public ResponseEntity<Void> deleteCurrentToken(@CookieValue("${app.jwt-refresh-token-cookie-name}") String refreshToken) {
         Integer userNo = AuthUtil.currentUserNo();
         
