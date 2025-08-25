@@ -8,17 +8,35 @@ spring.data.redis.port={REDIS_PORT}
 spring.data.redis.password={REDIS_PASS}
 spring.data.redis.timeout=2000
 spring.jooq.sql-dialect=mariadb
-logging.level.org.jooq.tools.LoggerListener=INFO
-
-jwt.refresh-token-cookie-name={refresh-token}
-jwt.secret-key={secret-key}
-
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
 spring.mail.username=${GMAIL_USERNAME}
 spring.mail.password=${GMAIL_PASSWORD}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
+logging.level.org.jooq.tools.LoggerListener=INFO
 
-redis.ttl.signup=300 # 5분
-redis.ttl.reset-password=600 # 10분
+# 비밀키
+app.jwt-secret={secret-key}
+
+# 쿠키이름
+app.jwt-refresh-token-cookie-name=refreshToken
+
+# AT 만료(분), 15분
+app.jwt-access-expiration-minutes=15
+
+# RT 만료(분), 30일
+app.jwt-refresh-expiration-minutes=43200
+
+# AT 재발급 가능한 임계 시점, 3분
+app.jwt-access-token-reissue-threshold-minutes=3
+
+# redis 회원가입 인증 코드 TTL, 5분
+app.redis-ttl-signup=300
+
+# redis 비밀번호 찾기 인증 코드 TTL, 5분
+app.redis-ttl-reset-password=600
+
+# rate limit 10초 동안 5회 허용
+app.redis-ratelimit-max-requests=5
+app.redis-ratelimit-window-seconds=10

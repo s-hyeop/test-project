@@ -19,5 +19,5 @@ public class AccessTokenResponse {
     private String accessToken;
 
     @JsonIgnore
-    private String refreshToken; 
+    private String refreshToken;
 }

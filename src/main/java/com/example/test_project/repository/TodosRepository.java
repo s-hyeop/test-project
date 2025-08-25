@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
@@ -37,21 +38,68 @@ public class TodosRepository {
     }
 
 
+    private Condition buildFilter(int userNo, String status, String searchType, String keyword) {
+        Condition condition = TODOS.USER_NO.eq(userNo);
+
+        // 상태 필터
+        if (StringUtils.hasText(status)) {
+            switch (status) {
+                case "complete"   -> condition = condition.and(TODOS.COMPLETED_AT.isNotNull());
+                case "incomplete" -> condition = condition.and(TODOS.COMPLETED_AT.isNull());
+            }
+        }
+
+        // 검색 필터
+        if (StringUtils.hasText(keyword) && StringUtils.hasText(searchType)) {
+            String pattern = "%" + keyword.trim() + "%";
+            switch (searchType) {
+                case "title"   -> condition = condition.and(TODOS.TITLE.likeIgnoreCase(pattern));
+                case "content" -> condition = condition.and(TODOS.CONTENT.likeIgnoreCase(pattern));
+            }
+        }
+
+        return condition;
+    }
+
+
     /**
      * 특정 회원의 Todo 목록을 페이징하여 조회합니다.
      *
      * @param userNo 조회할 회원 번호
      * @param offset 시작 위치 (0 기반)
      * @param limit  조회할 데이터 개수
+     * @param status  조회할 상태(complete|incomplete)
+     * @param searchType  검색할 대상(title|content)
+     * @param keyword  검색어
      * @return Todo 목록
      */
-    public List<Todos> findPageByUserNo(int userNo, int offset, int limit) {
+    public List<Todos> findPageByUserNo(int userNo, int offset, int limit, String status, String searchType, String keyword) {
+        Condition condition = buildFilter(userNo, status, searchType, keyword);
+
         return dslContext.selectFrom(TODOS)
-                .where(TODOS.USER_NO.eq(userNo))
-                .orderBy(TODOS.SEQUENCE.asc())
-                .limit(limit)
-                .offset(offset)
+                .where(condition)
+                .orderBy(TODOS.SEQUENCE.asc(), TODOS.CREATED_AT.asc())
+                .limit(offset * limit, limit)
                 .fetchInto(Todos.class);
+    }
+
+
+    /**
+     * 특정 회원의 Todo 특정 개수를 조회합니다.
+     *
+     * @param userNo 조회할 회원 번호
+     * @param status  조회할 상태(complete|incomplete)
+     * @param searchType  검색할 대상(title|content)
+     * @param keyword  검색어
+     * @return 총 Todo 개수
+     */
+    public int countPageByUserNo(int userNo, String status, String searchType, String keyword) {
+        Condition condition = buildFilter(userNo, status, searchType, keyword);
+
+        return dslContext.selectCount()
+                .from(TODOS)
+                .where(condition)
+                .fetchOne(0, int.class);
     }
 
 
@@ -96,7 +144,7 @@ public class TodosRepository {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
-        
+
         return dslContext.selectCount()
                 .from(TODOS)
                 .where(TODOS.USER_NO.eq(userNo))
@@ -123,7 +171,7 @@ public class TodosRepository {
      * @return 생성된 Todo의 사용자 번호
      * @throws org.jooq.exception.DataAccessException 데이터베이스 접근 중 오류 발생 시
      */
-    public Integer save(Todos todoPojo) {
+    public String save(Todos todoPojo) {
         Integer sequence = todoPojo.getSequence();
         if (sequence == null) {
             sequence = getNextSequence(todoPojo.getUserNo());
@@ -138,9 +186,9 @@ public class TodosRepository {
                 .set(TODOS.SEQUENCE, sequence)
                 .set(TODOS.DUE_AT, todoPojo.getDueAt())
                 .set(TODOS.CREATED_AT, todoPojo.getCreatedAt())
-                .returning(TODOS.TODO_ID) 
+                .returning(TODOS.TODO_ID)
                 .fetchOne()
-                .getUserNo();
+                .getTodoId();
     }
 
 
@@ -261,7 +309,8 @@ public class TodosRepository {
                 .from(TODOS)
                 .where(TODOS.USER_NO.eq(userNo))
                 .fetchOneInto(Integer.class);
-        
+
         return maxSequence != null ? maxSequence + 1 : 1;
     }
+
 }

@@ -2,7 +2,6 @@ buildscript {
 	ext {
 		jooqVersion = '3.19.25'
 	}
-
 }
 
 plugins {
@@ -47,10 +46,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
 	implementation ('org.springframework.boot:spring-boot-starter-jooq') {
 		exclude group: 'org.jooq:jooq'
 	}
+	implementation 'org.springframework.boot:spring-boot-devtools'
 
 	implementation "org.jooq:jooq:${jooqVersion}"
     implementation "org.jooq:jooq-meta:${jooqVersion}"
@@ -58,10 +59,14 @@ dependencies {
     jooqGenerator project(':jooq-custom')
 
 	implementation 'com.fasterxml.uuid:java-uuid-generator:5.1.0'
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

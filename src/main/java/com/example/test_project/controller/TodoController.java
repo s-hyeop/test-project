@@ -1,129 +1,204 @@
 package com.example.test_project.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.test_project.dto.request.TodoCreateRequest;
-import com.example.test_project.dto.request.TodoListRequest;
-import com.example.test_project.dto.request.TodoPatchRequest;
-import com.example.test_project.dto.request.TodoUpdateRequest;
-import com.example.test_project.dto.response.TodoCreateResponse;
-import com.example.test_project.dto.response.TodoDetailResponse;
-import com.example.test_project.dto.response.TodoListResponse;
-import com.example.test_project.dto.response.TodoStatisticsResponse;
+import com.example.test_project.config.exception.UnauthorizedException;
+import com.example.test_project.dto.request.*;
+import com.example.test_project.dto.response.*;
 import com.example.test_project.service.TodoService;
+import com.example.test_project.util.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+
+/**
+ * TO-DO 관련 REST API 컨트롤러
+ * 
+ * <>사용자의 TO-DO 항목을 관리하는 엔드포인트를 제공합니다.
+ * 모든 엔드포인트는 USER 권한이 필요합니다.</p>
+ */
+@Slf4j
 @RestController
 @RequestMapping("/todos")
-@Tag(name = "DOTO API", description = "TODO CRUD 및 통계 API")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('USER')")
 public class TodoController {
 
     private final TodoService todoService;
+    private final RateLimitUtil rateLimitUtil;
 
-
-
-    @Operation(summary = "TODO 목록 조회", description = "사용자가 등록한 TODO 목록을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 목록 조회됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * TO-DO 목록을 페이징하여 조회합니다.
+     * 
+     * @param todoListRequest 페이징 요청 정보 (page, size)
+     * @return TO-DO 목록과 페이징 정보를 포함한 응답
+     */
     @GetMapping("")
-    public ResponseEntity<TodoListResponse> getTodos(@Valid @RequestParam TodoListRequest todoListRequest) {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+    public ResponseEntity<TodoListResponse> getTodos(@Valid @ModelAttribute TodoListRequest todoListRequest) {
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
+
+        log.info("TO-DO 목록 조회 요청 - userNo: {}, page: {}, size: {}", userNo, todoListRequest.getPage(), todoListRequest.getSize());
 
         TodoListResponse todoListResponse = todoService.getTodos(userNo, todoListRequest);
+        log.debug("TO-DO 목록 조회 완료 - userNo: {}, 조회된 항목 수: {}", userNo, todoListResponse.getList().size());
+
         return ResponseEntity.ok().body(todoListResponse);
     }
 
 
-
-    @Operation(summary = "TODO 상세 조회", description = "특정 TODO의 상세 정보를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 상세 조회됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * 특정 TO-DO 항목의 상세 정보를 조회합니다.
+     * 
+     * @param todoId 조회할 TODO의 ID
+     * @return TO-DO 상세 정보
+     */
     @GetMapping("/{todoId}")
     public ResponseEntity<TodoDetailResponse> getTodo(@PathVariable String todoId) {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
 
+        log.info("TO-DO 상세 조회 요청 - userNo: {}, todoId: {}", userNo, todoId);
         TodoDetailResponse todoDetailResponse = todoService.getTodo(userNo, todoId);
+        log.debug("TO-DO 상세 조회 완료 - userNo: {}, todoId: {}", userNo, todoId);
+
         return ResponseEntity.ok().body(todoDetailResponse);
     }
 
 
-
-    @Operation(summary = "TODO 등록", description = "새로운 TODO을 등록합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 등록됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * 새로운 TO-DO 항목을 생성합니다.
+     * 
+     * <p>Rate limiting이 적용되어 있어 과도한 요청이 제한됩니다.</p>
+     * 
+     * @param todoCreateRequest TO-DO 생성 요청 정보
+     * @param request HTTP 요청 객체 (rate limiting용)
+     * @return 생성된 TODO의 ID를 포함한 응답
+     */
     @PostMapping("")
-    public ResponseEntity<TodoCreateResponse> createTodo(@Valid @RequestBody TodoCreateRequest todoCreateRequest) {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+    public ResponseEntity<TodoCreateResponse> createTodo(@Valid @RequestBody TodoCreateRequest todoCreateRequest, HttpServletRequest request) {
+        rateLimitUtil.checkRateLimit(request);
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
 
+        log.info("TO-DO 생성 요청 - userNo: {}, title: {}", userNo, todoCreateRequest.getTitle());
         TodoCreateResponse todoCreateResponse = todoService.createTodo(userNo, todoCreateRequest);
+        log.info("TO-DO 생성 완료 - userNo: {}, todoId: {}", userNo, todoCreateResponse.getTodoId());
+
         return ResponseEntity.ok().body(todoCreateResponse);
     }
 
 
-
-    @Operation(summary = "TODO 전체 수정", description = "특정 TODO의 모든 내용을 수정합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 수정됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * TO-DO 항목을 전체 수정합니다.
+     * 
+     * <p>모든 필드를 포함한 전체 업데이트를 수행합니다.</p>
+     * 
+     * @param todoId 수정할 TODO의 ID
+     * @param todoUpdateRequest TO-DO 수정 요청 정보
+     * @return 204 No Content
+     */
     @PutMapping("/{todoId}")
     public ResponseEntity<Void> updateTodo(@PathVariable String todoId, @Valid @RequestBody TodoUpdateRequest todoUpdateRequest) {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
 
+        log.info("TO-DO 수정 요청 - userNo: {}, todoId: {}", userNo, todoId);
         todoService.updateTodo(userNo, todoId, todoUpdateRequest);
-        return ResponseEntity.ok().build();
+        log.info("TO-DO 수정 완료 - userNo: {}, todoId: {}", userNo, todoId);
+
+        return ResponseEntity.noContent().build();
     }
 
 
-
-    @Operation(summary = "TODO 부분 수정", description = "특정 TODO의 일부 내용을 수정합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 부분 수정됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * TO-DO 항목을 부분 수정합니다.
+     * 
+     * <p>완료 상태나 순서 등 특정 필드만 수정할 때 사용합니다.</p>
+     * 
+     * @param todoId 수정할 TODO의 ID
+     * @param todoPatchRequest 부분 수정 요청 정보
+     * @return 204 No Content
+     */
     @PatchMapping("/{todoId}")
     public ResponseEntity<Void> patchTodo(@PathVariable String todoId, @Valid @RequestBody TodoPatchRequest todoPatchRequest) {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
 
+        log.info("TO-DO 부분 수정 요청 - userNo: {}, todoId: {}, sequence: {}, completed: {}", userNo, todoId, todoPatchRequest.getSequence(), todoPatchRequest.getCompleted());
         todoService.patchTodo(userNo, todoId, todoPatchRequest);
-        return ResponseEntity.ok().build();
+        log.info("TO-DO 부분 수정 완료 - userNo: {}, todoId: {}", userNo, todoId);
+
+        return ResponseEntity.noContent().build();
     }
 
 
-
-    @Operation(summary = "TODO 삭제", description = "특정 TODO을 삭제합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 TODO 삭제됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * TO-DO 항목을 삭제합니다.
+     * 
+     * @param todoId 삭제할 TODO의 ID
+     * @return 204 No Content
+     */
     @DeleteMapping("/{todoId}")
     public ResponseEntity<Void> deleteTodo(@PathVariable String todoId) {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
 
+        log.info("TO-DO 삭제 요청 - userNo: {}, todoId: {}", userNo, todoId);
         todoService.deleteTodo(userNo, todoId);
-        return ResponseEntity.ok().build();
+        log.info("TO-DO 삭제 완료 - userNo: {}, todoId: {}", userNo, todoId);
+
+        return ResponseEntity.noContent().build();
     }
 
 
-
-    @Operation(summary = "TODO 통계 조회", description = "사용자의 TODO 통계를 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "성공적으로 통계 조회됨")
-    // @PreAuthorize("hasRole('USER')") // TODO: 권한 상태가 USER 이상인가?
+    /**
+     * 사용자의 TO-DO 통계 정보를 조회합니다.
+     * 
+     * <p>전체 TO-DO 수, 완료된 TO-DO 수, 오늘 완료한 TO-DO 수 등의 통계를 제공합니다.</p>
+     * 
+     * @return TO-DO 통계 정보
+     */
     @GetMapping("/statistics")
     public ResponseEntity<TodoStatisticsResponse> getTodoStatistics() {
-        int userNo = 1; // TODO: JWT 토큰에서 userNo 추출
+        Integer userNo = AuthUtil.getCurrentUserNo();
+        if (userNo == null) {
+            throw new UnauthorizedException("인증 토큰이 잘못되었습니다.");
+        }
 
+        log.info("TO-DO 통계 조회 요청 - userNo: {}", userNo);
         TodoStatisticsResponse todoStatisticsResponse = todoService.getTodoStatistics(userNo);
+        log.debug("TO-DO 통계 조회 완료 - userNo: {}, total: {}, completed: {}, todayCompleted: {}",
+                userNo, todoStatisticsResponse.getTotalCount(),
+                todoStatisticsResponse.getCompletedCount(),
+                todoStatisticsResponse.getTodayCompletedCount());
+
         return ResponseEntity.ok().body(todoStatisticsResponse);
     }
 

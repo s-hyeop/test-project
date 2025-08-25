@@ -16,11 +16,11 @@
 - 11.8.x (LTS, Long Term Support), 그 중 최신 버전
 
 ### jOOQ
-- LTS 버전 없음  
+- LTS 버전 없음
 - 버전별 최소 요구 버전:
   - Open Source 3.21.x → JDK 21
   - Open Source 3.20.x → JDK 21
-  - Open Source 3.19.x → JDK 17, MariaDB 10.7  
+  - Open Source 3.19.x → JDK 17, MariaDB 10.7
 - 참고:
   - [JDK Support Matrix](https://www.jooq.org/download/support-matrix-jdk)
   - [jOOQ Support Matrix](https://www.jooq.org/download/support-matrix)
@@ -50,6 +50,3 @@ Repository {
   boolean delete(pk) return execute > 0
 }
 ```
-
-## REST API 참고 사항
- - ISO-8601 시간 형식 등 REST 원칙 준수 (추가 조사 및 보완 예정)

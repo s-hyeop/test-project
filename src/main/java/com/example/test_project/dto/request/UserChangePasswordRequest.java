@@ -1,6 +1,5 @@
 package com.example.test_project.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -11,11 +10,9 @@ import lombok.Getter;
 @Builder
 public class UserChangePasswordRequest {
 
-    @Schema(description = "현재 비밀번호", example = "oldPass123")
     @NotBlank(message = "현재 비밀번호는 비어 있을 수 없습니다.")
     private String password;
 
-    @Schema(description = "새로운 비밀번호 (영문+숫자 필수, 특수문자 선택, 6~72자)", example = "newPass123!")
     @NotBlank(message = "새로운 비밀번호는 비어 있을 수 없습니다.")
     @Size(min = 6, max = 72, message = "비밀번호는 6자 이상 72자 이하여야 합니다.")
     @Pattern(

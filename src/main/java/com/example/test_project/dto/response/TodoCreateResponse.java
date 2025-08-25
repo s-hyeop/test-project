@@ -2,7 +2,6 @@ package com.example.test_project.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TodoCreateResponse {
 
-    @Schema(description = "생성된 TODO ID", example = "********-****-****-****-************")
+    // 생성된 TO-DO ID
     private String todoId;
 
 }

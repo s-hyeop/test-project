@@ -1,4 +1,5 @@
 package jooq.custom.generator;
+
 import org.jooq.codegen.DefaultGeneratorStrategy;
 import org.jooq.meta.Definition;
 

@@ -300,6 +300,7 @@
     - Java OffsetDateTime
     - DB DATETIME
 
+
   * [보안] 이메일 인증 회수 제한
     - redis signup:email-code:난수 = ******
     - redis signup:email-fail-count:난수 = ******
@@ -363,3 +364,9 @@
 
           return loginResponse;
       }
+
+|남은내용
+  * 시큐리티 작성
+  * JWT 작성
+  * 에러 헨들러 작성
+  * 환경 변수화 시킬 내용 환경 변수 화
