@@ -96,3 +96,5 @@ logs/
 .env
 .env.*
 /.metadata/
+
+note.txt
