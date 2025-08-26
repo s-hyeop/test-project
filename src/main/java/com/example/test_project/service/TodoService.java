@@ -214,6 +214,7 @@ public class TodoService {
         updateTodoPojo.setContent(todoUpdateRequest.getContent());
         updateTodoPojo.setColor(todoUpdateRequest.getColor());
         updateTodoPojo.setDueAt(todoUpdateRequest.getDueAt());
+        updateTodoPojo.setSequence(todoUpdateRequest.getSequence());
         updateTodoPojo.setUpdatedAt(LocalDateTime.now());
 
         // TO-DO 수정

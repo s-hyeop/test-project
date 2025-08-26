@@ -30,4 +30,7 @@ public class TodoUpdateRequest {
     @NotNull(message = "마감일은 비어 있을 수 없습니다.")
     private LocalDate dueAt;
 
+    @NotNull(message = "순서는 비어 있을 수 없습니다.")
+    private Integer sequence;
+
 }
