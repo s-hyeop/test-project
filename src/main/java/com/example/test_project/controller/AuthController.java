@@ -230,6 +230,7 @@ public class AuthController {
      * 
      * <p>HttpOnly, Secure, SameSite 속성이 설정된 쿠키를 생성합니다.</p>
      * 
+     * ps. HTTPS(SSL) 사용시 [secure true, sameSite None] 가능
      * @param refreshToken Refresh Token 값
      * @return 설정된 ResponseCookie
      */
@@ -238,8 +239,8 @@ public class AuthController {
 
         return ResponseCookie.from(appProperties.getJwtRefreshTokenCookieName(), refreshToken)
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(false)
+                .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofMinutes(appProperties.getJwtRefreshExpirationMinutes()))
                 .build();
