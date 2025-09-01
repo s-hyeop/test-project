@@ -105,7 +105,7 @@ app.redis-ratelimit-window-seconds=10
 - 11.8.3, LTS, 최신 버전
 
 ### jOOQ
-- 3.9.25, 사용 가능한 최신 버전
+- 3.19.25, 사용 가능한 최신 버전
 - 버전별 최소 요구 버전:
   - Open Source 3.21.x → JDK 21
   - Open Source 3.20.x → JDK 21
