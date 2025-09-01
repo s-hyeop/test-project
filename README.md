@@ -138,3 +138,10 @@ Repository {
   int delete(pk) return execute
 }
 ```
+
+# 보안
+- 입력 검증 & 유효성 검사
+- Rate Limiting (Brute Force 방어, Redis 활용)
+- 이메일 인증 (Redis 활용)
+- JWT 기반 인증 (AT, RT(HttpOnly))
+- TODO 식별자 보호 (UUID v7 사용)
